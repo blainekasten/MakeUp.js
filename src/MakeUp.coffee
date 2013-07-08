@@ -76,7 +76,12 @@ class window.MakeUp
     date = text.substring(3,5)
     year = text.substring(6)
 
-    daysInMonths = {1:31, 2:29, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
+    #Leap Year
+    if year % 4 is 0
+      februaryDays = 29
+    else februaryDays = 28
+
+    daysInMonths = {1:31, 2:februaryDays, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
     if month > 12
       alert("There isn't a month higher than 12")
       @_modifyData("clear")

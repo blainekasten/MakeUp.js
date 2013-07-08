@@ -166,14 +166,19 @@
     };
 
     MakeUp.prototype._validateDate = function() {
-      var date, daysInMonths, month, text, year;
+      var date, daysInMonths, februaryDays, month, text, year;
       text = this.el.value;
       month = Number(text.substring(0, 2));
       date = text.substring(3, 5);
       year = text.substring(6);
+      if (year % 4 === 0) {
+        februaryDays = 29;
+      } else {
+        februaryDays = 28;
+      }
       daysInMonths = {
         1: 31,
-        2: 29,
+        2: februaryDays,
         3: 31,
         4: 30,
         5: 31,
