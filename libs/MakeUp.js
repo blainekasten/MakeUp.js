@@ -67,7 +67,7 @@
           this.formatForDate();
           break;
         case "numbers":
-          this.formatForNumbers("decimals");
+          this.formatForNumbers();
           break;
         case "numbers-with-decimals":
           this.formatForNumbers("decimals");

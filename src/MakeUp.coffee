@@ -5,7 +5,7 @@ class window.MakeUp
     switch inputType
       when "phone" then @formatForPhone()
       when "date" then @formatForDate()
-      when "numbers" then @formatForNumbers("decimals")
+      when "numbers" then @formatForNumbers()
       when "numbers-with-decimals" then @formatForNumbers("decimals")
 
   formatForPhone: () ->
