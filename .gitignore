@@ -1,5 +1,7 @@
-node_modules
-dist
+.DS_store
 .tmp
 .sass-cache
-app/bower_components
+
+*.swp
+*.swo
+makeup.html
