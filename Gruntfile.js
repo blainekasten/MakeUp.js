@@ -5,12 +5,12 @@ module.exports = function(grunt) {
     watch: {
       coffee: {
         files: ['src/*.coffee'],
-        tasks: ['coffee:compile']
+        tasks: ['coffee:compile', 'uglify:min']
       },
-      karma: {
+      /*karma: {
         files: ['src/*.coffee'],
         tasks: ['karma:unit:run']
-      }
+      }*/
     },
     pkg: grunt.file.readJSON('package.json'),
     coffee: {
@@ -32,11 +32,19 @@ module.exports = function(grunt) {
         configFile: 'karma.conf.js',
         background: false
       }
+    },
+    uglify: {
+      min: {
+        files: {
+          'libs/MakeUp.min.js': ['libs/MakeUp.js']
+        }
+      }
     }
   })
 
   grunt.registerTask('test', ['karma:test'])
   grunt.registerTask('develop', ['karma:unit', 'watch:coffee'])
+  grunt.registerTask('ugly', ['uglify:min'])
 }
 
 
