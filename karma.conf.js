@@ -29,7 +29,9 @@ files = [
 
 reporters = ['dots']; /* dots progress junit growl coverage */
 
-singleRun = false;
+port = 3000;
+
+//singleRun = false;
 //urlRoot = ''
 
 

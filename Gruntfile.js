@@ -4,13 +4,13 @@ module.exports = function(grunt) {
   grunt.initConfig({
     watch: {
       coffee: {
-        files: ['src/*.coffee'],
+        files: ['src/*.coffee', 'tests/*.coffee'],
         tasks: ['coffee:compile', 'uglify:min']
       },
-      /*karma: {
+      karma: {
         files: ['src/*.coffee'],
         tasks: ['karma:unit:run']
-      }*/
+      }
     },
     pkg: grunt.file.readJSON('package.json'),
     coffee: {
