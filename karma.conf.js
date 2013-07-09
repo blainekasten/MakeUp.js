@@ -21,17 +21,22 @@ colors = true;
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  //'src/**/*.coffee',
-  'libs/*.js',
+  'src/**/*.coffee',
+  //'libs/*.js',
   'tests/*.coffee'
 ];
 
+preprocessors = {
+  '**/*.coffee': 'coffee'
+};
 
 reporters = ['dots']; /* dots progress junit growl coverage */
 
-port = 3000;
+port = 9876;
+runnerPort = 9100;
+//port = 3000;
 
-//singleRun = false;
+singleRun = false;
 //urlRoot = ''
 
 
