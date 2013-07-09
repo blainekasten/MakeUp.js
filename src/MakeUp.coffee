@@ -24,7 +24,7 @@ class window.MakeUp
           return false
         else return true
       else if e.metaKey
-        @_allowDefaults(e)
+        @allowDefaults(e)
       #return false if key is not accepted.
       else return false
       
@@ -44,22 +44,22 @@ class window.MakeUp
           return false
         else return true
       else if e.metaKey
-        @_allowDefaults(e)
+        @allowDefaults(e)
       #return false if key is not accepted.
       else return false
 
     #validate the date on blur
     @el.onblur = (e) =>
-      @_validateDate()
+      @validateDate()
 
   formatForNumbers: (options = "") ->
-    if options is "decimals" then @format = "numbers" else @format = "numbersWithDecimals"
+    if options is "decimals" then @format = "numbersWithDecimals" else @format = "numbers"
     @el.onkeydown = (e) =>
       key = @keyMap[e.which]
       if Number(key) or key is "delete" or key is "left" or key is "right" or key is "tab"
         return true
       else if e.metaKey 
-        @_allowDefaults(e)
+        @allowDefaults(e)
       else if options is "decimals"
         if key is "."
           if /\./.test(@el.value) is false
@@ -67,10 +67,8 @@ class window.MakeUp
           else return false
         else return false
       else return false
-    @el.onblur = (e) =>
-      @_validateDate()
 
-  _validateDate: ->
+  validateDate: ->
     text = @el.value
     month = Number(text.substring(0,2))
     date = text.substring(3,5)
@@ -84,20 +82,21 @@ class window.MakeUp
     daysInMonths = {1:31, 2:februaryDays, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
     if month > 12
       alert("There isn't a month higher than 12")
-      @_modifyData("clear")
+      @modifyData("clear")
     if date > daysInMonths[month]
       alert("That is not a valid day for this month")
-      @_modifyData("clear")
+      @modifyData("clear")
 
-  _validatePaste: (previousText) ->
+  validatePaste: (previousText) ->
     if @format is "numbers"
       #Check if pasted data has anything besides numbers in it
-      if /[^0-9]/.test(@el.value) is false
-        @_modifyData("reset", previousText) 
+      if /[0-9]/.test(@el.value) is true
+        @modifyData("reset", previousText) 
     if @format is "date" or @format is "phone"
-      @_modifyData("reset", previousText)
+      @modifyData("reset", previousText)
 
-  _modifyData: (modifyType, resetText = "") ->
+  modifyData: (modifyType, resetText = "") ->
+    console.log("mod dat")
     #leave focus so we can set the value
     @el.blur()
     switch modifyType
@@ -106,12 +105,13 @@ class window.MakeUp
     #Refocus after 1 ms (without the timeout, setting the value fails)
     setTimeout((=>
       @el.focus()
-    ),2)
+    ),300)
+    
 
-  _allowDefaults: (e, format) ->
+  allowDefaults: (e, format) ->
     if @keyMap[e.which] is "v"
       previousText = @el.value
-      @_validatePaste(previousText)
+      @validatePaste(previousText)
 
 
 document.addEventListener "DOMContentLoaded", ->

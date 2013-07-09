@@ -93,7 +93,7 @@
             return true;
           }
         } else if (e.metaKey) {
-          return _this._allowDefaults(e);
+          return _this.allowDefaults(e);
         } else {
           return false;
         }
@@ -119,13 +119,13 @@
             return true;
           }
         } else if (e.metaKey) {
-          return _this._allowDefaults(e);
+          return _this.allowDefaults(e);
         } else {
           return false;
         }
       };
       return this.el.onblur = function(e) {
-        return _this._validateDate();
+        return _this.validateDate();
       };
     };
 
@@ -135,17 +135,17 @@
         options = "";
       }
       if (options === "decimals") {
-        this.format = "numbers";
-      } else {
         this.format = "numbersWithDecimals";
+      } else {
+        this.format = "numbers";
       }
-      this.el.onkeydown = function(e) {
+      return this.el.onkeydown = function(e) {
         var key;
         key = _this.keyMap[e.which];
         if (Number(key) || key === "delete" || key === "left" || key === "right" || key === "tab") {
           return true;
         } else if (e.metaKey) {
-          return _this._allowDefaults(e);
+          return _this.allowDefaults(e);
         } else if (options === "decimals") {
           if (key === ".") {
             if (/\./.test(_this.el.value) === false) {
@@ -160,12 +160,9 @@
           return false;
         }
       };
-      return this.el.onblur = function(e) {
-        return _this._validateDate();
-      };
     };
 
-    MakeUp.prototype._validateDate = function() {
+    MakeUp.prototype.validateDate = function() {
       var date, daysInMonths, februaryDays, month, text, year;
       text = this.el.value;
       month = Number(text.substring(0, 2));
@@ -192,30 +189,31 @@
       };
       if (month > 12) {
         alert("There isn't a month higher than 12");
-        this._modifyData("clear");
+        this.modifyData("clear");
       }
       if (date > daysInMonths[month]) {
         alert("That is not a valid day for this month");
-        return this._modifyData("clear");
+        return this.modifyData("clear");
       }
     };
 
-    MakeUp.prototype._validatePaste = function(previousText) {
+    MakeUp.prototype.validatePaste = function(previousText) {
       if (this.format === "numbers") {
-        if (/[^0-9]/.test(this.el.value) === false) {
-          this._modifyData("reset", previousText);
+        if (/[0-9]/.test(this.el.value) === true) {
+          this.modifyData("reset", previousText);
         }
       }
       if (this.format === "date" || this.format === "phone") {
-        return this._modifyData("reset", previousText);
+        return this.modifyData("reset", previousText);
       }
     };
 
-    MakeUp.prototype._modifyData = function(modifyType, resetText) {
+    MakeUp.prototype.modifyData = function(modifyType, resetText) {
       var _this = this;
       if (resetText == null) {
         resetText = "";
       }
+      console.log("mod dat");
       this.el.blur();
       switch (modifyType) {
         case "reset":
@@ -226,14 +224,14 @@
       }
       return setTimeout((function() {
         return _this.el.focus();
-      }), 2);
+      }), 300);
     };
 
-    MakeUp.prototype._allowDefaults = function(e, format) {
+    MakeUp.prototype.allowDefaults = function(e, format) {
       var previousText;
       if (this.keyMap[e.which] === "v") {
         previousText = this.el.value;
-        return this._validatePaste(previousText);
+        return this.validatePaste(previousText);
       }
     };
 

@@ -4,6 +4,10 @@ basePath = '';
 
 frameworks = ['jasmine'];
 
+logLevel = LOG_INFO;
+
+autoWatch = true;
+
 browsers = ['Safari']//, 'Firefox']//, 'PhantomJS'];
   /*
     Chrome
@@ -21,8 +25,8 @@ colors = true;
 files = [
   JASMINE,
   JASMINE_ADAPTER,
+  'lib/jquery.min.js',
   'src/**/*.coffee',
-  //'libs/*.js',
   'tests/*.coffee'
 ];
 
@@ -30,7 +34,7 @@ preprocessors = {
   '**/*.coffee': 'coffee'
 };
 
-reporters = ['dots']; /* dots progress junit growl coverage */
+reporters = ['progress']; /* dots progress junit growl coverage */
 
 port = 9876;
 runnerPort = 9100;

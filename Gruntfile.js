@@ -7,10 +7,10 @@ module.exports = function(grunt) {
         files: ['src/*.coffee', 'tests/*.coffee'],
         tasks: ['coffee:compile', 'uglify:min']
       },
-      karma: {
-        files: ['src/*.coffee'],
-        tasks: ['karma:unit:run']
-      }
+      //karma: {
+        //files: ['src/*.coffee'],
+        //tasks: ['karma:unit:run']
+      //}
     },
     pkg: grunt.file.readJSON('package.json'),
     coffee: {
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'libs/MakeUp.js': ['src/*.coffee']
+          'dist/MakeUp.js': ['src/*.coffee']
         }
       }
     },
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
     uglify: {
       min: {
         files: {
-          'libs/MakeUp.min.js': ['libs/MakeUp.js']
+          'dist/MakeUp.min.js': ['dist/MakeUp.js']
         }
       }
     }
