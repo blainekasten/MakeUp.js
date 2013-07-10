@@ -52,7 +52,8 @@
       37: "left",
       39: "right",
       91: "cmd",
-      9: "tab"
+      9: "tab",
+      16: "shift"
     };
 
     MakeUp.prototype.format = '';
@@ -71,8 +72,68 @@
           break;
         case "numbers-with-decimals":
           this.formatForNumbers("decimals");
+          break;
+        case "email":
+          this.formatForEmail();
       }
     }
+
+    MakeUp.prototype.formatForEmail = function() {
+      var _this = this;
+      this.format = "email";
+      if (this.el.placeholder === "") {
+        this.el.placeholder = "user@domain.com";
+      }
+      this.el.onkeydown = function(e) {
+        var atIndex, end, endIndex, key;
+        key = _this.keyMap[e.which];
+        if (_this.el.value.length === 0) {
+          _this.el.value = "@";
+          _this.el.setSelectionRange(0, -1);
+        }
+        if (_this.shouldPlacePeriod === true) {
+          endIndex = _this.el.value.length;
+          _this.el.value += ".";
+          _this.el.setSelectionRange(endIndex, endIndex);
+          _this.shouldPlacePeriod = false;
+        }
+        if (e.shiftKey) {
+          if (key === 2) {
+            atIndex = _this.el.value.indexOf("@");
+            if (_this.el.selectionStart === atIndex) {
+              _this.el.setSelectionRange(atIndex + 1, atIndex + 1);
+              if (/\@.*\./.test(_this.el.value) !== true) {
+                _this.shouldPlacePeriod = true;
+              }
+            }
+            return false;
+          }
+        }
+        if (key === ".") {
+          if (/.*\@.*\./.test(_this.el.value) === true) {
+            end = _this.el.value.length;
+            _this.el.setSelectionRange(end, end);
+            return false;
+          }
+        }
+        if (key === "delete") {
+          return _this.currVal = _this.el.value;
+        }
+      };
+      return this.el.onkeyup = function(e) {
+        var index, key;
+        key = _this.keyMap[e.which];
+        if (key === "delete") {
+          if (/\@/.test(_this.el.value) === false) {
+            if (_this.el.value !== "") {
+              _this.modifyData("reset", _this.currVal);
+              index = _this.el.value.indexOf("@");
+              return _this.el.setSelectionRange(index, index);
+            }
+          }
+        }
+      };
+    };
 
     MakeUp.prototype.formatForPhone = function() {
       var _this = this;
