@@ -75,8 +75,37 @@
           break;
         case "email":
           this.formatForEmail();
+          break;
+        case "state":
+          this.formatForState();
       }
     }
+
+    MakeUp.prototype.formatForState = function() {
+      var _this = this;
+      this.format = "state";
+      if (this.el.placeholder === "") {
+        this.el.placeholder = "MN";
+      }
+      return this.el.onkeydown = function(e) {
+        var key;
+        key = _this.keyMap[e.which];
+        if (_this.el.value.length === 2) {
+          if (!(key === "delete" || key === "tab" || key === "left" || key === "right")) {
+            return false;
+          }
+        } else if (key === "delete" || key === "tab" || key === "left" || key === "right" || key === "shift") {
+          return true;
+        } else if (e.metaKey) {
+          return _this.validatePaste(_this.el.value);
+        } else if (/[a-zA-Z]/.test(key) === true) {
+          _this.el.value += key.toUpperCase();
+          return false;
+        } else {
+          return false;
+        }
+      };
+    };
 
     MakeUp.prototype.formatForEmail = function() {
       var _this = this;

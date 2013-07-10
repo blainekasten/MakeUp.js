@@ -8,6 +8,24 @@ class window.MakeUp
       when "numbers" then @formatForNumbers()
       when "numbers-with-decimals" then @formatForNumbers("decimals")
       when "email" then @formatForEmail()
+      when "state" then @formatForState()
+
+
+  formatForState: () ->
+    @format = "state"
+    @el.placeholder = "MN" if @el.placeholder is ""
+    @el.onkeydown = (e) =>
+      key = @keyMap[e.which]
+      if @el.value.length is 2
+        return false unless key is "delete" or key is "tab" or key is "left" or key is "right"
+      else if key is "delete" or key is "tab" or key is "left" or key is "right" or key is "shift" 
+        return true
+      else if e.metaKey
+        @validatePaste(@el.value)
+      else if /[a-zA-Z]/.test(key) is true
+        @el.value += key.toUpperCase()
+        return false
+      else return false
 
   formatForEmail: () ->
     @format = "email"
