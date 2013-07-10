@@ -90,13 +90,12 @@ class window.MakeUp
   validatePaste: (previousText) ->
     if @format is "numbers"
       #Check if pasted data has anything besides numbers in it
-      if /[0-9]/.test(@el.value) is true
+      if /[^0-9]/.test(@el.value) is true
         @modifyData("reset", previousText) 
     if @format is "date" or @format is "phone"
       @modifyData("reset", previousText)
 
   modifyData: (modifyType, resetText = "") ->
-    console.log("mod dat")
     #leave focus so we can set the value
     @el.blur()
     switch modifyType
@@ -112,7 +111,6 @@ class window.MakeUp
     if @keyMap[e.which] is "v"
       previousText = @el.value
       @validatePaste(previousText)
-
 
 document.addEventListener "DOMContentLoaded", ->
   arrayOfInputElements = document.getElementsByTagName('input')

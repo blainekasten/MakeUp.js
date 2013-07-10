@@ -199,7 +199,7 @@
 
     MakeUp.prototype.validatePaste = function(previousText) {
       if (this.format === "numbers") {
-        if (/[0-9]/.test(this.el.value) === true) {
+        if (/[^0-9]/.test(this.el.value) === true) {
           this.modifyData("reset", previousText);
         }
       }
@@ -213,7 +213,6 @@
       if (resetText == null) {
         resetText = "";
       }
-      console.log("mod dat");
       this.el.blur();
       switch (modifyType) {
         case "reset":
