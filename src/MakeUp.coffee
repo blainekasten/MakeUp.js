@@ -21,17 +21,22 @@ class window.MakeUp
       else if key is "delete" or key is "tab" or key is "left" or key is "right" or key is "shift" 
         return true
       else if e.metaKey
-        @validatePaste(@el.value)
+        @currVal = @el.value
       else if /[a-zA-Z]/.test(key) is true
         @el.value += key.toUpperCase()
         return false
       else return false
+    @el.onkeyup = (e) =>
+      if e.metaKey
+        @allowDefaults(e)
 
   formatForEmail: () ->
     @format = "email"
     @el.placeholder = "user@domain.com" if @el.placeholder is ""
     @el.onkeydown = (e) =>
       key = @keyMap[e.which]
+      if e.metaKey
+        @validatePaste(@el.value)
       if (@el.value.length is 0)
         @el.value = "@"
         @el.setSelectionRange(0, -1)
@@ -154,6 +159,10 @@ class window.MakeUp
         @modifyData("reset", previousText) 
     if @format is "date" or @format is "phone"
       @modifyData("reset", previousText)
+    if @format is "state"
+      if /[^A-Z]/.test(@el.value) is true or @el.value.length > 2
+        console.log "state"
+        @modifyData('reset', previousText)
 
   modifyData: (modifyType, resetText = "") ->
     #leave focus so we can set the value
@@ -167,9 +176,11 @@ class window.MakeUp
     ),300)
     
 
-  allowDefaults: (e, format) ->
+  allowDefaults: (e) ->
     if @keyMap[e.which] is "v"
-      previousText = @el.value
+      if @currValue
+        previousText = @currValue
+      else previousText = @el.value
       @validatePaste(previousText)
 
 document.addEventListener "DOMContentLoaded", ->

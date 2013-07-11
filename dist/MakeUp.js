@@ -87,7 +87,7 @@
       if (this.el.placeholder === "") {
         this.el.placeholder = "MN";
       }
-      return this.el.onkeydown = function(e) {
+      this.el.onkeydown = function(e) {
         var key;
         key = _this.keyMap[e.which];
         if (_this.el.value.length === 2) {
@@ -97,12 +97,17 @@
         } else if (key === "delete" || key === "tab" || key === "left" || key === "right" || key === "shift") {
           return true;
         } else if (e.metaKey) {
-          return _this.validatePaste(_this.el.value);
+          return _this.currVal = _this.el.value;
         } else if (/[a-zA-Z]/.test(key) === true) {
           _this.el.value += key.toUpperCase();
           return false;
         } else {
           return false;
+        }
+      };
+      return this.el.onkeyup = function(e) {
+        if (e.metaKey) {
+          return _this.allowDefaults(e);
         }
       };
     };
@@ -116,6 +121,9 @@
       this.el.onkeydown = function(e) {
         var atIndex, end, endIndex, key;
         key = _this.keyMap[e.which];
+        if (e.metaKey) {
+          _this.validatePaste(_this.el.value);
+        }
         if (_this.el.value.length === 0) {
           _this.el.value = "@";
           _this.el.setSelectionRange(0, -1);
@@ -294,7 +302,13 @@
         }
       }
       if (this.format === "date" || this.format === "phone") {
-        return this.modifyData("reset", previousText);
+        this.modifyData("reset", previousText);
+      }
+      if (this.format === "state") {
+        if (/[^A-Z]/.test(this.el.value) === true || this.el.value.length > 2) {
+          console.log("state");
+          return this.modifyData('reset', previousText);
+        }
       }
     };
 
@@ -316,10 +330,14 @@
       }), 300);
     };
 
-    MakeUp.prototype.allowDefaults = function(e, format) {
+    MakeUp.prototype.allowDefaults = function(e) {
       var previousText;
       if (this.keyMap[e.which] === "v") {
-        previousText = this.el.value;
+        if (this.currValue) {
+          previousText = this.currValue;
+        } else {
+          previousText = this.el.value;
+        }
         return this.validatePaste(previousText);
       }
     };
