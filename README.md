@@ -11,3 +11,5 @@ An HTML5 compatible data formatting tool for input tags that is SUPER EASY to us
 ## Currently we support:
 
 phone, date, numbers, numbers-with-decimals, email, state (all for 'merica formats)
+
+##### Internationalization to come...
