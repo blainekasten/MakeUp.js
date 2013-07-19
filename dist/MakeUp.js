@@ -240,7 +240,7 @@
       return this.el.onkeydown = function(e) {
         var key;
         key = _this.keyMap[e.which];
-        if (Number(key) || key === "delete" || key === "left" || key === "right" || key === "tab") {
+        if (Number(key) || key === "delete" || key === "left" || key === "right" || key === "tab" || key === 0) {
           return true;
         } else if (e.metaKey) {
           return _this.allowDefaults(e);

@@ -121,7 +121,7 @@ class window.MakeUp
     if options is "decimals" then @format = "numbersWithDecimals" else @format = "numbers"
     @el.onkeydown = (e) =>
       key = @keyMap[e.which]
-      if Number(key) or key is "delete" or key is "left" or key is "right" or key is "tab"
+      if Number(key) or key is "delete" or key is "left" or key is "right" or key is "tab" or key is 0
         return true
       else if e.metaKey 
         @allowDefaults(e)
