@@ -2,6 +2,17 @@
                                                                                 \[ ]√
                                                                                  |X|</pre>
 
+<pre>           __________________________________________________________________
+         /       \==\==\  ___   \  / __  \   \  ___        \    __           /
+        /         \  \  \ \   \  \/\ \__\ \   \ \  \  __    \  \ _\         /
+( *_*) (___________\_____\_\___\√_\_\_\____\___\_\__\ \_\ \__\_\__\________/
+\[ ]√                                              \  
+ |X|                                                \ 
+
+
+</pre>
+
+
 An HTML5 compatible data formatting tool for input tags that is SUPER EASY to use!
 
 1. Just download the minified js file!
