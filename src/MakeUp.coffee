@@ -110,6 +110,18 @@ class window.MakeUp
         else return true
       else if e.metaKey
         @allowDefaults(e)
+      else if key is "t"
+        date = new Date
+        month = date.getMonth() + 1
+        day = date.getDate()
+        
+        if month < 10
+          month = "0#{month}"
+        if day < 10 
+          day = "0#{day}"
+
+        @el.value = "#{month}/#{day}/#{date.getFullYear()}"
+        return false
       #return false if key is not accepted.
       else return false
 

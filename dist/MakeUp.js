@@ -205,7 +205,7 @@
         this.el.placeholder = "01/01/1971";
       }
       this.el.onkeydown = function(e) {
-        var key;
+        var date, day, key, month;
         key = _this.keyMap[e.which];
         if (Number(key) || key === 0 || key === "delete" || key === "left" || key === "right" || key === "tab") {
           if ((_this.el.value.length === 2 || _this.el.value.length === 5) && key !== "delete") {
@@ -218,6 +218,18 @@
           }
         } else if (e.metaKey) {
           return _this.allowDefaults(e);
+        } else if (key === "t") {
+          date = new Date;
+          month = date.getMonth() + 1;
+          day = date.getDate();
+          if (month < 10) {
+            month = "0" + month;
+          }
+          if (day < 10) {
+            day = "0" + day;
+          }
+          _this.el.value = "" + month + "/" + day + "/" + (date.getFullYear());
+          return false;
         } else {
           return false;
         }
