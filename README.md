@@ -1,5 +1,6 @@
-MakeUp.js
-=========
+<pre>MakeUp.js                                                                       (*_*)
+                                                                                \[ ]√
+                                                                                 |X|</pre>
 
 An HTML5 compatible data formatting tool for input tags that is SUPER EASY to use!
 
