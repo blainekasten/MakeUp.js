@@ -358,16 +358,29 @@
 
   })();
 
-  document.addEventListener("DOMContentLoaded", function() {
-    var arrayOfInputElements, element, inputType, _i, _len, _results;
-    arrayOfInputElements = document.getElementsByTagName('input');
-    _results = [];
-    for (_i = 0, _len = arrayOfInputElements.length; _i < _len; _i++) {
-      element = arrayOfInputElements[_i];
-      inputType = element.getAttribute('data-format');
-      _results.push(new window.MakeUp(inputType, element));
+  window.MakeUpLoader = (function() {
+    function MakeUpLoader() {
+      this.makeUpReload();
     }
-    return _results;
+
+    MakeUpLoader.prototype.makeUpReload = function() {
+      var arrayOfInputElements, element, inputType, _i, _len, _results;
+      arrayOfInputElements = document.getElementsByTagName('input');
+      _results = [];
+      for (_i = 0, _len = arrayOfInputElements.length; _i < _len; _i++) {
+        element = arrayOfInputElements[_i];
+        inputType = element.getAttribute('data-format');
+        _results.push(new window.MakeUp(inputType, element));
+      }
+      return _results;
+    };
+
+    return MakeUpLoader;
+
+  })();
+
+  document.addEventListener("DOMContentLoaded", function() {
+    return new window.MakeUpLoader();
   });
 
 }).call(this);
