@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Date
- @{#}Version:       1.0.0
+ @{#}Version:       1.1.0
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide date formatting to input fields
  @{#}Author:        Blaine Kasten

@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Numbers
- @{#}Version:       1.0.0
+ @{#}Version:       1.1.0
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide number formatting to input fields
  @{#}Author:        Blaine Kasten

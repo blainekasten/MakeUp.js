@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp
- @{#}Version:       1.0.0
+ @{#}Version:       1.1.0
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       A base class to extend and create different input
                     formatting tools.

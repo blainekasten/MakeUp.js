@@ -1,6 +1,6 @@
 /*
  @{#}Object:        MakeUp
- @{#}Version:       1.0.0
+ @{#}Version:       1.1.0
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       A base class to extend and create different input
                     formatting tools.
@@ -241,6 +241,25 @@
 
   })();
 
+  /*
+   @{#}Object:        MakeUpLoader
+   @{#}Version:       1.1.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       An object to instantiate a MakeUp object, and give the ability to reload the makeup objects
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
   window.MakeUpLoader = (function() {
     function MakeUpLoader() {
       this.makeUpReload();
@@ -268,7 +287,7 @@
 
   /*
    @{#}Object:        MakeUp.Date
-   @{#}Version:       1.0.0
+   @{#}Version:       1.1.0
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide date formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -370,7 +389,7 @@
 
   /*
    @{#}Object:        MakeUp.Email
-   @{#}Version:       1.0.0
+   @{#}Version:       1.1.0
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide email formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -410,7 +429,7 @@
 
   /*
    @{#}Object:        MakeUp.Numbers
-   @{#}Version:       1.0.0
+   @{#}Version:       1.1.0
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide number formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -459,7 +478,7 @@
 
   /*
    @{#}Object:        MakeUp.Phone
-   @{#}Version:       1.0.0
+   @{#}Version:       1.1.0
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide phone formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -523,7 +542,7 @@
 
   /*
    @{#}Object:        MakeUp.State
-   @{#}Version:       1.0.0
+   @{#}Version:       1.1.0
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide state formatting to input fields
    @{#}Author:        Blaine Kasten

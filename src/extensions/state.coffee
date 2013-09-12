@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.State
- @{#}Version:       1.0.0
+ @{#}Version:       1.1.0
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide state formatting to input fields
  @{#}Author:        Blaine Kasten
