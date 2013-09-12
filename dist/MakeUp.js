@@ -1,4 +1,27 @@
+/*
+ @{#}Object:        MakeUp
+ @{#}Version:       1.0.0
+ @{#}Last Updated:  sept 12, 2013
+ @{#}Purpose:       A base class to extend and create different input
+                    formatting tools.
+ @{#}Author:        Blaine Kasten
+ @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                    OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                    LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                    EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                    FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                    AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                    OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   window.MakeUp = (function() {
     MakeUp.prototype.keyMap = {
       65: 'a',
@@ -48,6 +71,8 @@
       104: 8,
       105: 9,
       190: '.',
+      191: '/',
+      111: '/',
       8: "delete",
       37: "left",
       39: "right",
@@ -62,249 +87,46 @@
       this.el = el;
       switch (inputType) {
         case "phone":
-          this.formatForPhone();
+          new MakeUp.Phone(this.el);
           break;
         case "date":
-          this.formatForDate();
+          new MakeUp.Date(this.el);
           break;
         case "numbers":
-          this.formatForNumbers();
+          new MakeUp.Numbers(this.el);
           break;
         case "numbers-with-decimals":
-          this.formatForNumbers("decimals");
+          new MakeUp.Numbers(this.el, 'decimals');
           break;
         case "email":
-          this.formatForEmail();
+          new MakeUp.Email(this.el);
           break;
         case "state":
-          this.formatForState();
+          new MakeUp.State(this.el);
       }
     }
 
-    MakeUp.prototype.formatForState = function() {
+    MakeUp.prototype.bindEvents = function() {
       var _this = this;
-      this.format = "state";
-      if (this.el.placeholder === "") {
-        this.el.placeholder = "MN";
-      }
       this.el.onkeydown = function(e) {
         var key;
-        key = _this.keyMap[e.which];
-        if (_this.el.value.length === 2) {
-          if (!(key === "delete" || key === "tab" || key === "left" || key === "right")) {
-            return false;
+        if (!(_this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
+          if (e.metaKey) {
+            _this.validatePaste();
           }
-        } else if (key === "delete" || key === "tab" || key === "left" || key === "right" || key === "shift") {
-          return true;
-        } else if (e.metaKey) {
-          return _this.currVal = _this.el.value;
-        } else if (/[a-zA-Z]/.test(key) === true) {
-          _this.el.value += key.toUpperCase();
-          return false;
-        } else {
-          return false;
+          key = _this.keyMap[e.which];
+          e.preventDefault();
+          return _this.keydown(key);
         }
       };
-      return this.el.onkeyup = function(e) {
-        if (e.metaKey) {
-          return _this.allowDefaults(e);
-        }
-      };
-    };
-
-    MakeUp.prototype.formatForEmail = function() {
-      var _this = this;
-      this.format = "email";
-      if (this.el.placeholder === "") {
-        this.el.placeholder = "user@domain.com";
-      }
-      this.el.onkeydown = function(e) {
-        var atIndex, end, endIndex, key;
-        key = _this.keyMap[e.which];
-        if (e.metaKey) {
-          _this.validatePaste(_this.el.value);
-        }
-        if (_this.el.value.length === 0) {
-          _this.el.value = "@";
-          _this.el.setSelectionRange(0, -1);
-        }
-        if (_this.shouldPlacePeriod === true) {
-          endIndex = _this.el.value.length;
-          _this.el.value += ".";
-          _this.el.setSelectionRange(endIndex, endIndex);
-          _this.shouldPlacePeriod = false;
-        }
-        if (e.shiftKey) {
-          if (key === 2) {
-            atIndex = _this.el.value.indexOf("@");
-            if (_this.el.selectionStart === atIndex) {
-              _this.el.setSelectionRange(atIndex + 1, atIndex + 1);
-              if (/\@.*\./.test(_this.el.value) !== true) {
-                _this.shouldPlacePeriod = true;
-              }
-            }
-            return false;
-          }
-        }
-        if (key === ".") {
-          if (/.*\@.*\./.test(_this.el.value) === true) {
-            end = _this.el.value.length;
-            _this.el.setSelectionRange(end, end);
-            return false;
-          }
-        }
-        if (key === "delete") {
-          return _this.currVal = _this.el.value;
-        }
-      };
-      return this.el.onkeyup = function(e) {
-        var index, key;
-        key = _this.keyMap[e.which];
-        if (key === "delete") {
-          if (/\@/.test(_this.el.value) === false) {
-            if (_this.el.value !== "") {
-              _this.modifyData("reset", _this.currVal);
-              index = _this.el.value.indexOf("@");
-              return _this.el.setSelectionRange(index, index);
-            }
-          }
-        }
-      };
-    };
-
-    MakeUp.prototype.formatForPhone = function() {
-      var _this = this;
-      this.format = "phone";
-      if (this.el.placeholder === "") {
-        this.el.placeholder = "000-000-0000";
-      }
-      return this.el.onkeydown = function(e) {
+      this.el.onkeyup = function(e) {
         var key;
         key = _this.keyMap[e.which];
-        if (Number(key) || key === 0 || key === "delete" || key === "left" || key === "right" || key === "tab") {
-          if ((_this.el.value.length === 3 || _this.el.value.length === 7) && key !== "delete") {
-            _this.el.value = "" + _this.el.value + "-";
-            return true;
-          } else if (_this.el.value.length === 12 && key !== "delete" && key !== "tab") {
-            return false;
-          } else {
-            return true;
-          }
-        } else if (e.metaKey) {
-          return _this.allowDefaults(e);
-        } else {
-          return false;
-        }
-      };
-    };
-
-    MakeUp.prototype.formatForDate = function() {
-      var _this = this;
-      this.format = "date";
-      if (this.el.placeholder === "") {
-        this.el.placeholder = "01/01/1971";
-      }
-      this.el.onkeydown = function(e) {
-        var date, day, key, month;
-        key = _this.keyMap[e.which];
-        if (Number(key) || key === 0 || key === "delete" || key === "left" || key === "right" || key === "tab") {
-          if ((_this.el.value.length === 2 || _this.el.value.length === 5) && key !== "delete") {
-            _this.el.value = "" + _this.el.value + "/";
-            return true;
-          } else if (_this.el.value.length === 10 && key !== "delete" && key !== "tab") {
-            return false;
-          } else {
-            return true;
-          }
-        } else if (e.metaKey) {
-          return _this.allowDefaults(e);
-        } else if (key === "t") {
-          date = new Date;
-          month = date.getMonth() + 1;
-          day = date.getDate();
-          if (month < 10) {
-            month = "0" + month;
-          }
-          if (day < 10) {
-            day = "0" + day;
-          }
-          _this.el.value = "" + month + "/" + day + "/" + (date.getFullYear());
-          return false;
-        } else {
-          return false;
-        }
+        return _this.keyup(key);
       };
       return this.el.onblur = function(e) {
-        return _this.validateDate();
+        return _this.blur(e);
       };
-    };
-
-    MakeUp.prototype.formatForNumbers = function(options) {
-      var _this = this;
-      if (options == null) {
-        options = "";
-      }
-      if (options === "decimals") {
-        this.format = "numbersWithDecimals";
-      } else {
-        this.format = "numbers";
-      }
-      return this.el.onkeydown = function(e) {
-        var key;
-        key = _this.keyMap[e.which];
-        if (Number(key) || key === "delete" || key === "left" || key === "right" || key === "tab" || key === 0) {
-          return true;
-        } else if (e.metaKey) {
-          return _this.allowDefaults(e);
-        } else if (options === "decimals") {
-          if (key === ".") {
-            if (/\./.test(_this.el.value) === false) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      };
-    };
-
-    MakeUp.prototype.validateDate = function() {
-      var date, daysInMonths, februaryDays, month, text, year;
-      text = this.el.value;
-      month = Number(text.substring(0, 2));
-      date = text.substring(3, 5);
-      year = text.substring(6);
-      if (year % 4 === 0) {
-        februaryDays = 29;
-      } else {
-        februaryDays = 28;
-      }
-      daysInMonths = {
-        1: 31,
-        2: februaryDays,
-        3: 31,
-        4: 30,
-        5: 31,
-        6: 30,
-        7: 31,
-        8: 31,
-        9: 30,
-        10: 31,
-        11: 30,
-        12: 31
-      };
-      if (month > 12) {
-        alert("There isn't a month higher than 12");
-        this.modifyData("clear");
-      }
-      if (date > daysInMonths[month]) {
-        alert("That is not a valid day for this month");
-        return this.modifyData("clear");
-      }
     };
 
     MakeUp.prototype.validatePaste = function(previousText) {
@@ -342,16 +164,77 @@
       }), 300);
     };
 
-    MakeUp.prototype.allowDefaults = function(e) {
-      var previousText;
-      if (this.keyMap[e.which] === "v") {
-        if (this.currValue) {
-          previousText = this.currValue;
-        } else {
-          previousText = this.el.value;
-        }
-        return this.validatePaste(previousText);
+    MakeUp.prototype.setPlaceholder = function(placeholder) {
+      if (this.el.placeholder === "") {
+        return this.el.placeholder = placeholder;
       }
+    };
+
+    MakeUp.prototype.acceptedCharsAtIndex = function(regex, index, key) {
+      var currIndex, indices;
+      indices = index.toArray();
+      currIndex = indices.includes(this.el.value.length);
+      if (currIndex && regex.test(key)) {
+        return this.shouldApply = true;
+      } else {
+        return this.shouldApply = false;
+      }
+    };
+
+    MakeUp.prototype.acceptedChars = function(regex, key) {
+      if (regex.test(key)) {
+        return this.shouldApply = true;
+      } else {
+        return this.shouldApply = false;
+      }
+    };
+
+    MakeUp.prototype.insertCharsAtIndex = function(str, index) {
+      var i, _i, _len, _results;
+      if (index instanceof Array) {
+        _results = [];
+        for (_i = 0, _len = index.length; _i < _len; _i++) {
+          i = index[_i];
+          if (this.el.value.length === i) {
+            _results.push(this.el.value += str);
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      } else {
+        if (this.el.value.length === index) {
+          return this.el.value += str;
+        }
+      }
+    };
+
+    MakeUp.prototype.checkLimit = function() {
+      if (this.el.value.length >= this.limit) {
+        return this.shouldApply = false;
+      }
+    };
+
+    MakeUp.prototype.applyChar = function(key) {
+      if (this.shouldApply === true) {
+        return this.el.value += key;
+      }
+    };
+
+    MakeUp.prototype.alwaysAcceptableKeys = function() {
+      return [91, 16, 9, 8, 46, 37, 38, 39, 40];
+    };
+
+    MakeUp.prototype.navigateSelectionBack = function() {
+      return this.el.setSelectionRange(0, -1);
+    };
+
+    MakeUp.prototype.keydown = function() {};
+
+    MakeUp.prototype.keyup = function() {};
+
+    MakeUp.prototype.blur = function() {
+      return this.validate();
     };
 
     return MakeUp;
@@ -382,5 +265,334 @@
   document.addEventListener("DOMContentLoaded", function() {
     return new window.MakeUpLoader();
   });
+
+  /*
+   @{#}Object:        MakeUp.Date
+   @{#}Version:       1.0.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       Provide date formatting to input fields
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
+  MakeUp.Date = (function(_super) {
+    __extends(Date, _super);
+
+    function Date(el) {
+      this.el = el;
+      this.setPlaceholder('01/31/1971');
+      this.format = 'date';
+      this.limit = 10.;
+      this.bindEvents();
+    }
+
+    Date.prototype.keydown = function(e, key) {
+      this.shouldApply = false;
+      e.preventDefault();
+      this.acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key);
+      this.checkLimit();
+      return this.applyChar(key);
+    };
+
+    Date.prototype.keyup = function(e) {
+      var key;
+      key = this.keyMap[e.which];
+      this.easeUse(key);
+      if (key !== 'delete') {
+        return this.insertCharsAtIndex('/', [2, 5]);
+      }
+    };
+
+    Date.prototype.validate = function() {
+      var date, daysInMonths, februaryDays, month, text, year;
+      text = this.el.value;
+      month = Number(text.substring(0, 2));
+      date = text.substring(3, 5);
+      year = text.substring(6);
+      if (year % 4 === 0) {
+        februaryDays = 29;
+      } else {
+        februaryDays = 28;
+      }
+      daysInMonths = {
+        1: 31,
+        2: februaryDays,
+        3: 31,
+        4: 30,
+        5: 31,
+        6: 30,
+        7: 31,
+        8: 31,
+        9: 30,
+        10: 31,
+        11: 30,
+        12: 31
+      };
+      if (month > 12) {
+        alert("There isn't a month higher than 12");
+        this.modifyData("clear");
+      }
+      if (date > daysInMonths[month]) {
+        alert("That is not a valid day for this month");
+        return this.modifyData("clear");
+      }
+    };
+
+    Date.prototype.easeUse = function(key) {
+      var val;
+      val = this.el.value;
+      if (val.length === 1) {
+        if (/[2-9]/.test(key)) {
+          return this.el.value = "0" + val;
+        } else if (key === '/') {
+          return this.el.value = "0" + val + "/";
+        }
+      } else if (val.length === 2) {
+        if (val === '13') {
+          return this.el.value = "0" + val[0] + "/" + val[1];
+        }
+      }
+    };
+
+    return Date;
+
+  })(MakeUp);
+
+  /*
+   @{#}Object:        MakeUp.Email
+   @{#}Version:       1.0.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       Provide email formatting to input fields
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
+  MakeUp.Email = (function(_super) {
+    __extends(Email, _super);
+
+    function Email(el) {
+      this.el = el;
+      this.format = "email";
+      this.setPlaceholder("user@domain.com");
+      this.bindEvents();
+    }
+
+    Email.prototype.validate = function() {
+      if (/.*\@.*\.(com|org|net)/.test(this.el.value) === false && this.el.value.length > 0) {
+        alert('The format you entered is not a valid email format. Please try again');
+        return this.el.value = '';
+      }
+    };
+
+    return Email;
+
+  })(MakeUp);
+
+  /*
+   @{#}Object:        MakeUp.Numbers
+   @{#}Version:       1.0.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       Provide number formatting to input fields
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
+  MakeUp.Numbers = (function(_super) {
+    __extends(Numbers, _super);
+
+    function Numbers(el, options) {
+      this.el = el;
+      if (options == null) {
+        options = '';
+      }
+      this.format = "numbers";
+      this.bindEvents();
+    }
+
+    Numbers.prototype.keydown = function(e) {
+      var key;
+      this.shouldApply = false;
+      if (!(this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
+        if (e.metaKey) {
+          this.validatePaste();
+        }
+        key = this.keyMap[e.which];
+        e.preventDefault();
+        this.acceptedChars(/[0-9]/, key);
+        return this.applyChar(key);
+      }
+    };
+
+    return Numbers;
+
+  })(MakeUp);
+
+  /*
+   @{#}Object:        MakeUp.Phone
+   @{#}Version:       1.0.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       Provide phone formatting to input fields
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
+  MakeUp.Phone = (function(_super) {
+    __extends(Phone, _super);
+
+    function Phone(el) {
+      this.el = el;
+      this.format = "phone";
+      this.limit = 12;
+      this.setPlaceholder('000-000-0000');
+      this.bindEvents();
+    }
+
+    Phone.prototype.keydown = function(e) {
+      var key;
+      if (!(this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
+        e.preventDefault();
+        if (e.metaKey) {
+          this.validatePaste();
+        }
+        key = this.keyMap[e.which];
+        this.acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key);
+        this.checkLimit();
+        return this.applyChar(key);
+      }
+    };
+
+    Phone.prototype.keyup = function(e) {
+      var key;
+      key = this.keyMap[e.which];
+      if (key !== 'delete') {
+        return this.insertCharsAtIndex('-', [3, 7]);
+      }
+    };
+
+    Phone.prototype.validate = function() {
+      console.log(this.el.value);
+      if (/[0-9]{3}-[0-9]{3}-[0-9]{4}/.test(this.el.value) === false && this.el.value.length > 0) {
+        alert("The phone number format you entered is not correct.");
+        return this.el.value = '';
+      }
+    };
+
+    return Phone;
+
+  })(MakeUp);
+
+  /*
+   @{#}Object:        MakeUp.State
+   @{#}Version:       1.0.0
+   @{#}Last Updated:  sept 12, 2013
+   @{#}Purpose:       Provide state formatting to input fields
+   @{#}Author:        Blaine Kasten
+   @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                      OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                      LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                      FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                      EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                      FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                      AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                      OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+
+  MakeUp.State = (function(_super) {
+    __extends(State, _super);
+
+    function State(el) {
+      this.el = el;
+      this.setPlaceholder('MN');
+      this.format = 'state';
+      this.limit = 2;
+      this.bindEvents();
+    }
+
+    State.prototype.keydown = function(key) {
+      this.shouldApply = true;
+      key = this.uppercaseChar(key);
+      this.acceptedChars(/[A-Z]/, key);
+      this.checkLimit();
+      return this.applyChar(key);
+    };
+
+    State.prototype.validate = function() {};
+
+    State.prototype.uppercaseChar = function(key) {
+      if (/[a-zA-Z]/.test(key) && key !== void 0) {
+        return key.toUpperCase();
+      }
+    };
+
+    return State;
+
+  })(MakeUp);
+
+  Array.prototype.includes = function(val) {
+    if (this.lastIndexOf(val) === -1) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  String.prototype.toArray = function() {
+    var i, indices, j, max, min, split, _i, _j, _len, _ref;
+    indices = [];
+    _ref = this.split(/,/);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
+      split = i.split(/-/);
+      min = Number(split[0]);
+      max = Number(split[1]);
+      for (j = _j = min; min <= max ? _j <= max : _j >= max; j = min <= max ? ++_j : --_j) {
+        indices.push(j);
+      }
+    }
+    return indices;
+  };
 
 }).call(this);

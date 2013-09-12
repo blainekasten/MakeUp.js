@@ -1,168 +1,51 @@
+###
+ @{#}Object:        MakeUp
+ @{#}Version:       1.0.0
+ @{#}Last Updated:  sept 12, 2013
+ @{#}Purpose:       A base class to extend and create different input
+                    formatting tools.
+ @{#}Author:        Blaine Kasten
+ @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
+                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+                    OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+                    LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+                    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+                    EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+                    FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+                    AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+                    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+                    OR OTHER DEALINGS IN THE SOFTWARE.
+###
+
 class window.MakeUp
-  keyMap: {65:'a', 66:'b', 67:'c', 68:'d', 69:'e', 70:'f', 71:'g', 72:'h', 73:'i', 74:'j', 75:'k', 76:'l', 77:'m', 78:'n', 79:'o', 80:'p', 81:'q', 82:'r', 83:'s', 84:'t', 85:'u', 86:'v', 87:'w', 88:'x', 89:'y', 90:'z', 48:0, 49:1, 50:2, 51:3, 52:4, 53:5, 54:6, 55:7, 56:8, 57:9, 96:0, 97:1, 98:2, 99:3, 100:4, 101:5, 102:6, 103:7, 104:8, 105:9, 190:'.', 8:"delete", 37:"left", 39:"right", 91:"cmd", 9:"tab", 16:"shift"}
+  keyMap: {65:'a', 66:'b', 67:'c', 68:'d', 69:'e', 70:'f', 71:'g', 72:'h', 73:'i', 74:'j', 75:'k', 76:'l', 77:'m', 78:'n', 79:'o', 80:'p', 81:'q', 82:'r', 83:'s', 84:'t', 85:'u', 86:'v', 87:'w', 88:'x', 89:'y', 90:'z', 48:0, 49:1, 50:2, 51:3, 52:4, 53:5, 54:6, 55:7, 56:8, 57:9, 96:0, 97:1, 98:2, 99:3, 100:4, 101:5, 102:6, 103:7, 104:8, 105:9, 190:'.', 191:'/', 111:'/', 8:"delete", 37:"left", 39:"right", 91:"cmd", 9:"tab", 16:"shift"}
   format: ''
   constructor: (inputType, @el) ->
     switch inputType
-      when "phone" then @formatForPhone()
-      when "date" then @formatForDate()
-      when "numbers" then @formatForNumbers()
-      when "numbers-with-decimals" then @formatForNumbers("decimals")
-      when "email" then @formatForEmail()
-      when "state" then @formatForState()
+      when "phone" then new MakeUp.Phone(@el)
+      when "date" then new MakeUp.Date(@el)
+      when "numbers" then new MakeUp.Numbers(@el)
+      when "numbers-with-decimals" then new MakeUp.Numbers(@el, 'decimals')
+      when "email" then new MakeUp.Email(@el)
+      when "state" then new MakeUp.State(@el)
 
-
-  formatForState: () ->
-    @format = "state"
-    @el.placeholder = "MN" if @el.placeholder is ""
+  #
+  ## bindEvents: ->
+  ## The motherboard of this application.
+  #
+  bindEvents: ->
     @el.onkeydown = (e) =>
-      key = @keyMap[e.which]
-      if @el.value.length is 2
-        return false unless key is "delete" or key is "tab" or key is "left" or key is "right"
-      else if key is "delete" or key is "tab" or key is "left" or key is "right" or key is "shift" 
-        return true
-      else if e.metaKey
-        @currVal = @el.value
-      else if /[a-zA-Z]/.test(key) is true
-        @el.value += key.toUpperCase()
-        return false
-      else return false
-    @el.onkeyup = (e) =>
-      if e.metaKey
-        @allowDefaults(e)
-
-  formatForEmail: () ->
-    @format = "email"
-    @el.placeholder = "user@domain.com" if @el.placeholder is ""
-    @el.onkeydown = (e) =>
-      key = @keyMap[e.which]
-      if e.metaKey
-        @validatePaste(@el.value)
-      if (@el.value.length is 0)
-        @el.value = "@"
-        @el.setSelectionRange(0, -1)
-      if (@shouldPlacePeriod is true)
-        endIndex = @el.value.length
-        @el.value += "."
-        @el.setSelectionRange(endIndex, endIndex)
-        @shouldPlacePeriod = false
-      if (e.shiftKey)
-        if (key is 2)
-          atIndex = @el.value.indexOf("@")
-          if @el.selectionStart is atIndex
-            @el.setSelectionRange(atIndex+1, atIndex+1)
-            @shouldPlacePeriod = true unless /\@.*\./.test(@el.value) is true
-          return false
-      if (key is ".")
-        #make sure the rest is in line already
-        if /.*\@.*\./.test(@el.value) is true
-          end = @el.value.length
-          @el.setSelectionRange(end, end)
-          return false
-
-      if key is "delete"
-        @currVal = @el.value
+      unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
+        if e.metaKey
+          @validatePaste()
+        key = @keyMap[e.which]
+        e.preventDefault()
+        @keydown(key)
     @el.onkeyup = (e) =>
       key = @keyMap[e.which]
-      if (key is "delete")
-        #if the delete key removes the @ symbol, reset
-        if /\@/.test(@el.value) is false 
-          unless @el.value is ""
-            @modifyData("reset", @currVal) 
-            index = @el.value.indexOf("@")
-            @el.setSelectionRange(index, index)
-
-
-
-  formatForPhone: () ->
-    @format = "phone"
-    #user defined placeholder over-rides a default
-    @el.placeholder = "000-000-0000" if @el.placeholder is ""
-    @el.onkeydown = (e) =>
-      key = @keyMap[e.which]
-      if Number(key) or key is 0 or key is "delete" or key is "left" or key is "right" or key is "tab"
-        if (@el.value.length is 3 || @el.value.length is 7) && key isnt "delete"
-          #append a slash when adding text and reaching a 2 or 5 length
-          @el.value = "#{@el.value}-"
-          return true
-        else if @el.value.length is 12 and key isnt "delete" and key isnt "tab"
-          #length has reached maximum date length, so stop
-          return false
-        else return true
-      else if e.metaKey
-        @allowDefaults(e)
-      #return false if key is not accepted.
-      else return false
-      
-  formatForDate: () ->
-    @format = "date"
-    #user defined placeholder over-rides a default
-    @el.placeholder = "01/01/1971" if @el.placeholder is ""
-    @el.onkeydown = (e) =>
-      key = @keyMap[e.which]
-      if Number(key) or key is 0 or key is "delete" or key is "left" or key is "right" or key is "tab"
-        if (@el.value.length is 2 || @el.value.length is 5) && key isnt "delete"
-          #append a slash when adding text and reaching a 2 or 5 length
-          @el.value = "#{@el.value}/"
-          return true
-        else if @el.value.length is 10 and key isnt "delete" and key isnt "tab"
-          #length has reached maximum date length, so stop
-          return false
-        else return true
-      else if e.metaKey
-        @allowDefaults(e)
-      else if key is "t"
-        date = new Date
-        month = date.getMonth() + 1
-        day = date.getDate()
-        
-        if month < 10
-          month = "0#{month}"
-        if day < 10 
-          day = "0#{day}"
-
-        @el.value = "#{month}/#{day}/#{date.getFullYear()}"
-        return false
-      #return false if key is not accepted.
-      else return false
-
-    #validate the date on blur
+      @keyup(key)
     @el.onblur = (e) =>
-      @validateDate()
-
-  formatForNumbers: (options = "") ->
-    if options is "decimals" then @format = "numbersWithDecimals" else @format = "numbers"
-    @el.onkeydown = (e) =>
-      key = @keyMap[e.which]
-      if Number(key) or key is "delete" or key is "left" or key is "right" or key is "tab" or key is 0
-        return true
-      else if e.metaKey 
-        @allowDefaults(e)
-      else if options is "decimals"
-        if key is "."
-          if /\./.test(@el.value) is false
-            return true
-          else return false
-        else return false
-      else return false
-
-  validateDate: ->
-    text = @el.value
-    month = Number(text.substring(0,2))
-    date = text.substring(3,5)
-    year = text.substring(6)
-
-    #Leap Year
-    if year % 4 is 0
-      februaryDays = 29
-    else februaryDays = 28
-
-    daysInMonths = {1:31, 2:februaryDays, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-    if month > 12
-      alert("There isn't a month higher than 12")
-      @modifyData("clear")
-    if date > daysInMonths[month]
-      alert("That is not a valid day for this month")
-      @modifyData("clear")
+      @blur(e)
 
   validatePaste: (previousText) ->
     if @format is "numbers"
@@ -177,32 +60,88 @@ class window.MakeUp
         @modifyData('reset', previousText)
 
   modifyData: (modifyType, resetText = "") ->
-    #leave focus so we can set the value
     @el.blur()
     switch modifyType
       when "reset" then @el.value = resetText
       when "clear" then @el.value = ""
-    #Refocus after 1 ms (without the timeout, setting the value fails)
     setTimeout((=>
       @el.focus()
     ),300)
-    
 
-  allowDefaults: (e) ->
-    if @keyMap[e.which] is "v"
-      if @currValue
-        previousText = @currValue
-      else previousText = @el.value
-      @validatePaste(previousText)
+  #
+  ## setPlaceholder
+  ## placeholder = string for what the placeholder should default to
+  ##            (this is typically an indicator of what the field should accept)
+  #
+  setPlaceholder: (placeholder) ->
+    @el.placeholder = placeholder if @el.placeholder is ""
 
-class window.MakeUpLoader
-  constructor: ->
-    @makeUpReload()
-  makeUpReload: ->
-    arrayOfInputElements = document.getElementsByTagName('input')
-    for element in arrayOfInputElements
-      inputType = element.getAttribute('data-format')
-      new window.MakeUp(inputType, element)
+  #
+  ## acceptedCharsAtIndex: ->
+  ## regex = regex of acceptable chars
+  ## index = int of string placement
+  ## key = key that was pressed
+  #
+  acceptedCharsAtIndex: (regex, index, key) ->
+    indices = index.toArray()
+    currIndex = indices.includes(@el.value.length)
 
-document.addEventListener "DOMContentLoaded", ->
-  new window.MakeUpLoader()
+    if currIndex and regex.test(key)
+      @shouldApply = true
+    else
+      @shouldApply = false
+ 
+  acceptedChars: (regex, key) ->
+    if regex.test(key)
+      @shouldApply = true
+    else @shouldApply = false
+
+
+
+  #
+  ## insertCharsAtIndex: ->
+  ## str = String of characters
+  ## index = int or array of string placement
+  #
+  insertCharsAtIndex: (str, index) ->
+    if index instanceof Array
+      for i in index
+        if @el.value.length == i
+          @el.value += str 
+    else
+      if @el.value.length == index
+        @el.value += str 
+
+
+  #
+  ## checkLimit ->
+  ## Checks if typing is past the limit
+  #
+  checkLimit: ->
+    if @el.value.length >= @limit
+      @shouldApply = false
+
+  #
+  ## applyChar: ->
+  ## The final step in a makeup object
+  #
+  applyChar: (key) ->
+    @el.value += key if @shouldApply is true 
+
+  #
+  ## alwaysAcceptableKeys: ->
+  ## A list of always acceptable characters for fields
+  ## generic arrows, metakeys, and delete keys
+  #
+  alwaysAcceptableKeys: ->
+    [91, 16, 9, 8, 46, 37, 38, 39, 40]
+
+  navigateSelectionBack: ->
+     @el.setSelectionRange(0, -1)
+
+
+  # Methods to be over-riden
+  keydown: ->
+  keyup: ->
+  blur: ->
+    @validate()

@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     watch: {
       coffee: {
-        files: ['src/*.coffee', 'tests/*.coffee'],
+        files: ['src/**/*.coffee', 'tests/*.coffee'],
         tasks: ['coffee:compile', 'uglify:min']
       },
       //karma: {
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'dist/MakeUp.js': ['src/*.coffee']
+          'dist/MakeUp.js': ['src/**/*.coffee']
         }
       }
     },

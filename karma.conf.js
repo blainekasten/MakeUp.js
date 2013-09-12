@@ -25,7 +25,7 @@ colors = true;
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  'lib/jquery.min.js',
+  'libs/jquery.min.js',
   'src/**/*.coffee',
   'tests/*.coffee'
 ];

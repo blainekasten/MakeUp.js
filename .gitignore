@@ -5,3 +5,7 @@
 *.swp
 *.swo
 makeup.html
+
+node_modules/
+node_modules/*
+node_modlues/**
