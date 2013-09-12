@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Date
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide date formatting to input fields
  @{#}Author:        Blaine Kasten
@@ -20,17 +20,22 @@ class MakeUp.Date extends MakeUp
 
   #
   ## Constructor 
-  #
+
   constructor: (@el) ->
     @setPlaceholder('01/31/1971')
     @format = 'date'
-    @limit = (10)
+    @limit = 10
     @bindEvents()
+
+  #
+  ## keydown: ->
 
   keydown: (key) ->
     @acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key)
-    @checkLimit()
     @applyChar(key)
+
+  #
+  ## keyup: ->
 
   keyup: (key) ->
     @easeUse(key)
@@ -39,8 +44,7 @@ class MakeUp.Date extends MakeUp
 
   #
   ## validate()
-  ## Function { Makes sure the date entered is valid }
-  #
+
   validate: ->
     text = @el.value
     month = Number(text.substring(0,2))
@@ -61,8 +65,9 @@ class MakeUp.Date extends MakeUp
       @modifyData("clear")
 
   #
+  ## easeUse: ->
   ## Conditionals for how each key should react
-  #
+
   easeUse: (key) ->
     val = @el.value
     if val.length is 1

@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.State
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide state formatting to input fields
  @{#}Author:        Blaine Kasten
@@ -17,21 +17,35 @@
 ###
 
 class MakeUp.State extends MakeUp
+
+  #
+  ## constructor: ->
+
   constructor: (@el) ->
     @setPlaceholder('MN')
     @format = 'state'
     @limit = 2
     @bindEvents()
 
+  #
+  ## keydown: ->
+
   keydown: (key) ->
-    @shouldApply = true
-    key = @uppercaseChar(key)
+    ey = @uppercaseChar(key)
     @acceptedChars(/[A-Z]/, key)
-    @checkLimit()
     @applyChar(key)
 
-  validate: ->
+  #
+  ## validate: ->
 
+  validate: ->
+    if /[A-Z]{2}/.test(@el.value) is false and @el.value.length > 0
+      alert('The format for this field needs to be "MN"')
+      @el.value = ''
+
+  #
+  ## uppercaseChar: ->
+  ## This will uppercase the users entered key.
 
   uppercaseChar: (key) ->
     if /[a-zA-Z]/.test(key) and key != undefined

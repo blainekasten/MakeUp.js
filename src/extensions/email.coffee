@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Email
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide email formatting to input fields
  @{#}Author:        Blaine Kasten
@@ -17,12 +17,32 @@
 ###
 
 class MakeUp.Email extends MakeUp
+
+  #
+  ## constructor: ->
+
   constructor: (@el) ->
     @format = "email"
     @setPlaceholder("user@domain.com")
     @bindEvents()
 
+  #
+  ## keydown: ->
+
+  keydown: (key) ->
+    @shouldApply = true
+    @applyChar(key)
+
+  #
+  ## validate: ->
+
   validate: ->
     if /.*\@.*\.(com|org|net)/.test(@el.value) is false and @el.value.length > 0
       alert('The format you entered is not a valid email format. Please try again')
       @el.value = ''
+
+  #
+  ## alwaysAcceptableKeys: ->
+
+  alwaysAcceptableKeys: ->
+    [91, 16, 9, 8, 46, 37, 38, 39, 40, shiftKey]

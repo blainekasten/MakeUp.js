@@ -17,13 +17,25 @@
 ###
 
 class window.MakeUpLoader
+
+  #
+  ## constructor: ->
+
   constructor: ->
     @makeUpReload()
+
+  #
+  ## makeUpReload: ->
+
   makeUpReload: ->
     arrayOfInputElements = document.getElementsByTagName('input')
     for element in arrayOfInputElements
       inputType = element.getAttribute('data-format')
       new window.MakeUp(inputType, element)
+
+
+#
+## Binds makeup loading on dom loaded
 
 document.addEventListener "DOMContentLoaded", ->
   new window.MakeUpLoader()

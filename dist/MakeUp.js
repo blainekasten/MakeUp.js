@@ -1,6 +1,6 @@
 /*
  @{#}Object:        MakeUp
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       A base class to extend and create different input
                     formatting tools.
@@ -95,9 +95,6 @@
         case "numbers":
           new MakeUp.Numbers(this.el);
           break;
-        case "numbers-with-decimals":
-          new MakeUp.Numbers(this.el, 'decimals');
-          break;
         case "email":
           new MakeUp.Email(this.el);
           break;
@@ -148,9 +145,8 @@
     };
 
     MakeUp.prototype.acceptedCharsAtIndex = function(regex, index, key) {
-      var currIndex, indices;
-      indices = index.toArray();
-      currIndex = indices.includes(this.el.value.length);
+      var currIndex;
+      currIndex = index.toArray().includes(this.el.value.length);
       if (currIndex && regex.test(key)) {
         return this.shouldApply = true;
       } else {
@@ -186,24 +182,16 @@
       }
     };
 
-    MakeUp.prototype.checkLimit = function() {
-      if (this.el.value.length >= this.limit) {
-        return this.shouldApply = false;
-      }
-    };
-
     MakeUp.prototype.applyChar = function(key) {
-      if (this.shouldApply === true) {
-        return this.el.value += key;
+      if (!(this.el.value.length >= this.limit)) {
+        if (this.shouldApply === true) {
+          return this.el.value += key;
+        }
       }
     };
 
     MakeUp.prototype.alwaysAcceptableKeys = function() {
       return [91, 16, 9, 8, 46, 37, 38, 39, 40];
-    };
-
-    MakeUp.prototype.navigateSelectionBack = function() {
-      return this.el.setSelectionRange(0, -1);
     };
 
     MakeUp.prototype.keydown = function() {};
@@ -264,7 +252,7 @@
 
   /*
    @{#}Object:        MakeUp.Date
-   @{#}Version:       1.1.0
+   @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide date formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -288,13 +276,12 @@
       this.el = el;
       this.setPlaceholder('01/31/1971');
       this.format = 'date';
-      this.limit = 10.;
+      this.limit = 10;
       this.bindEvents();
     }
 
     Date.prototype.keydown = function(key) {
       this.acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key);
-      this.checkLimit();
       return this.applyChar(key);
     };
 
@@ -362,7 +349,7 @@
 
   /*
    @{#}Object:        MakeUp.Email
-   @{#}Version:       1.1.0
+   @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide email formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -389,11 +376,20 @@
       this.bindEvents();
     }
 
+    Email.prototype.keydown = function(key) {
+      this.shouldApply = true;
+      return this.applyChar(key);
+    };
+
     Email.prototype.validate = function() {
       if (/.*\@.*\.(com|org|net)/.test(this.el.value) === false && this.el.value.length > 0) {
         alert('The format you entered is not a valid email format. Please try again');
         return this.el.value = '';
       }
+    };
+
+    Email.prototype.alwaysAcceptableKeys = function() {
+      return [91, 16, 9, 8, 46, 37, 38, 39, 40, shiftKey];
     };
 
     return Email;
@@ -402,7 +398,7 @@
 
   /*
    @{#}Object:        MakeUp.Numbers
-   @{#}Version:       1.1.0
+   @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide number formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -431,17 +427,16 @@
       this.bindEvents();
     }
 
-    Numbers.prototype.keydown = function(e) {
-      var key;
+    Numbers.prototype.keydown = function(key) {
       this.shouldApply = false;
-      if (!(this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
-        if (e.metaKey) {
-          this.validatePaste();
-        }
-        key = this.keyMap[e.which];
-        e.preventDefault();
-        this.acceptedChars(/[0-9]/, key);
-        return this.applyChar(key);
+      this.acceptedChars(/[0-9]/, key);
+      return this.applyChar(key);
+    };
+
+    Numbers.prototype.validate = function() {
+      if (/^[0-9]+$/.test(this.el.value) === false && this.el.value.length > 0) {
+        alert('This field will only accept numbers.');
+        return this.el.value = '';
       }
     };
 
@@ -451,7 +446,7 @@
 
   /*
    @{#}Object:        MakeUp.Phone
-   @{#}Version:       1.1.0
+   @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide phone formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -479,30 +474,18 @@
       this.bindEvents();
     }
 
-    Phone.prototype.keydown = function(e) {
-      var key;
-      if (!(this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
-        e.preventDefault();
-        if (e.metaKey) {
-          this.validatePaste();
-        }
-        key = this.keyMap[e.which];
-        this.acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key);
-        this.checkLimit();
-        return this.applyChar(key);
-      }
+    Phone.prototype.keydown = function(key) {
+      this.acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key);
+      return this.applyChar(key);
     };
 
-    Phone.prototype.keyup = function(e) {
-      var key;
-      key = this.keyMap[e.which];
+    Phone.prototype.keyup = function(key) {
       if (key !== 'delete') {
         return this.insertCharsAtIndex('-', [3, 7]);
       }
     };
 
     Phone.prototype.validate = function() {
-      console.log(this.el.value);
       if (/[0-9]{3}-[0-9]{3}-[0-9]{4}/.test(this.el.value) === false && this.el.value.length > 0) {
         alert("The phone number format you entered is not correct.");
         return this.el.value = '';
@@ -515,7 +498,7 @@
 
   /*
    @{#}Object:        MakeUp.State
-   @{#}Version:       1.1.0
+   @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide state formatting to input fields
    @{#}Author:        Blaine Kasten
@@ -544,14 +527,18 @@
     }
 
     State.prototype.keydown = function(key) {
-      this.shouldApply = true;
-      key = this.uppercaseChar(key);
+      var ey;
+      ey = this.uppercaseChar(key);
       this.acceptedChars(/[A-Z]/, key);
-      this.checkLimit();
       return this.applyChar(key);
     };
 
-    State.prototype.validate = function() {};
+    State.prototype.validate = function() {
+      if (/[A-Z]{2}/.test(this.el.value) === false && this.el.value.length > 0) {
+        alert('The format for this field needs to be "MN"');
+        return this.el.value = '';
+      }
+    };
 
     State.prototype.uppercaseChar = function(key) {
       if (/[a-zA-Z]/.test(key) && key !== void 0) {

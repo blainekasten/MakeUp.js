@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Numbers
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide number formatting to input fields
  @{#}Author:        Blaine Kasten
@@ -20,20 +20,23 @@ class MakeUp.Numbers extends MakeUp
 
   #
   ## constructor: ->
-  #
+
   constructor: (@el, options = '') ->
     @format = "numbers"
     @bindEvents()
 
   #
   ## keydown: ->
-  #
-  keydown: (e) ->
+
+  keydown: (key) ->
     @shouldApply = false
-    unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
-      if e.metaKey
-        @validatePaste()
-      key = @keyMap[e.which]
-      e.preventDefault()
-      @acceptedChars(/[0-9]/, key)
-      @applyChar(key)
+    @acceptedChars(/[0-9]/, key)
+    @applyChar(key)
+
+  #
+  ## validate: ->
+
+  validate: ->
+    if /^[0-9]+$/.test(@el.value) is false and @el.value.length > 0
+      alert('This field will only accept numbers.')
+      @el.value = ''

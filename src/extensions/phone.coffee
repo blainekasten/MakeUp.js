@@ -1,6 +1,6 @@
 ###
  @{#}Object:        MakeUp.Phone
- @{#}Version:       1.1.0
+ @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide phone formatting to input fields
  @{#}Author:        Blaine Kasten
@@ -17,29 +17,34 @@
 ###
 
 class MakeUp.Phone extends MakeUp
+
+  #
+  ## constructor: ->
+
   constructor: (@el) ->
     @format = "phone"
     @limit = 12
     @setPlaceholder('000-000-0000')
     @bindEvents()
 
-  keydown: (e) ->
-    unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
-      e.preventDefault()
-      if e.metaKey
-        @validatePaste()
-      key = @keyMap[e.which]
-      @acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key)
-      @checkLimit()
-      @applyChar(key)
+  #
+  ## keydown: ->
 
-  keyup: (e) ->
-    key = @keyMap[e.which]
+  keydown: (key) ->
+    @acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key)
+    @applyChar(key)
+
+  #
+  ## keyup: ->
+
+  keyup: (key) ->
     unless key is 'delete'
       @insertCharsAtIndex('-', [3,7])
 
+  #
+  ## validate: ->
+
   validate: ->
-    console.log @el.value
     if /[0-9]{3}-[0-9]{3}-[0-9]{4}/.test(@el.value) is false and @el.value.length > 0
       alert("The phone number format you entered is not correct.")
       @el.value = ''
