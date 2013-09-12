@@ -36,28 +36,13 @@ class window.MakeUp
   bindEvents: ->
     @el.onkeydown = (e) =>
       unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
-        if e.metaKey
-          @validatePaste()
-        key = @keyMap[e.which]
         e.preventDefault()
-        @keydown(key)
+        @shouldApply = false
+        @keydown(@keyMap[e.which])
     @el.onkeyup = (e) =>
-      key = @keyMap[e.which]
-      @keyup(key)
+      @keyup(@keyMap[e.which])
     @el.onblur = (e) =>
       @blur(e)
-
-  validatePaste: (previousText) ->
-    if @format is "numbers"
-      #Check if pasted data has anything besides numbers in it
-      if /[^0-9]/.test(@el.value) is true
-        @modifyData("reset", previousText) 
-    if @format is "date" or @format is "phone"
-      @modifyData("reset", previousText)
-    if @format is "state"
-      if /[^A-Z]/.test(@el.value) is true or @el.value.length > 2
-        console.log "state"
-        @modifyData('reset', previousText)
 
   modifyData: (modifyType, resetText = "") ->
     @el.blur()

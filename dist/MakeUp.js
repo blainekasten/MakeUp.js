@@ -109,41 +109,18 @@
     MakeUp.prototype.bindEvents = function() {
       var _this = this;
       this.el.onkeydown = function(e) {
-        var key;
         if (!(_this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
-          if (e.metaKey) {
-            _this.validatePaste();
-          }
-          key = _this.keyMap[e.which];
           e.preventDefault();
-          return _this.keydown(key);
+          _this.shouldApply = false;
+          return _this.keydown(_this.keyMap[e.which]);
         }
       };
       this.el.onkeyup = function(e) {
-        var key;
-        key = _this.keyMap[e.which];
-        return _this.keyup(key);
+        return _this.keyup(_this.keyMap[e.which]);
       };
       return this.el.onblur = function(e) {
         return _this.blur(e);
       };
-    };
-
-    MakeUp.prototype.validatePaste = function(previousText) {
-      if (this.format === "numbers") {
-        if (/[^0-9]/.test(this.el.value) === true) {
-          this.modifyData("reset", previousText);
-        }
-      }
-      if (this.format === "date" || this.format === "phone") {
-        this.modifyData("reset", previousText);
-      }
-      if (this.format === "state") {
-        if (/[^A-Z]/.test(this.el.value) === true || this.el.value.length > 2) {
-          console.log("state");
-          return this.modifyData('reset', previousText);
-        }
-      }
     };
 
     MakeUp.prototype.modifyData = function(modifyType, resetText) {
@@ -315,17 +292,13 @@
       this.bindEvents();
     }
 
-    Date.prototype.keydown = function(e, key) {
-      this.shouldApply = false;
-      e.preventDefault();
+    Date.prototype.keydown = function(key) {
       this.acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key);
       this.checkLimit();
       return this.applyChar(key);
     };
 
-    Date.prototype.keyup = function(e) {
-      var key;
-      key = this.keyMap[e.which];
+    Date.prototype.keyup = function(key) {
       this.easeUse(key);
       if (key !== 'delete') {
         return this.insertCharsAtIndex('/', [2, 5]);

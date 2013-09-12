@@ -27,15 +27,12 @@ class MakeUp.Date extends MakeUp
     @limit = (10)
     @bindEvents()
 
-  keydown: (e, key) ->
-    @shouldApply = false
-    e.preventDefault()
+  keydown: (key) ->
     @acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key)
     @checkLimit()
     @applyChar(key)
 
-  keyup: (e) ->
-    key = @keyMap[e.which]
+  keyup: (key) ->
     @easeUse(key)
     unless key is 'delete'
       @insertCharsAtIndex('/', [2,5])
