@@ -335,7 +335,7 @@
       } else if (date > daysInMonths[month]) {
         alert("That is not a valid day for this month");
         return this.el.value = '';
-      } else if (/[0-1]{1}[0-2]{1}\/[0-3]{1}[0-9]{1}\/[1-2]{1}[0-9]{3}/.test(this.el.value) === false && this.el.value.length > 0) {
+      } else if (/[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(this.el.value) === false && this.el.value.length > 0) {
         alert("The date format is not correct. Please try again.");
         return this.el.value = '';
       }

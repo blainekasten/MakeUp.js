@@ -58,7 +58,7 @@ class MakeUp.Date extends MakeUp
     else if date > daysInMonths[month]
       alert("That is not a valid day for this month")
       @el.value = ''
-    else if /[0-1]{1}[0-2]{1}\/[0-3]{1}[0-9]{1}\/[1-2]{1}[0-9]{3}/.test(@el.value) is false and @el.value.length > 0
+    else if /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(@el.value) is false and @el.value.length > 0
       alert("The date format is not correct. Please try again.")
       @el.value = ''
 
