@@ -1,55 +1,47 @@
-describe 'State formatter', ->
+describe 'MakeUp.State', ->
   beforeEach ->
-    @e = $.Event("keydown")
-    @e.which = 65
-    sEl = document.createElement "input"
-    sEl.data-format = "state"
-    document.documentElement.appendChild sEl
-    @makeup = new MakeUp("state", sEl)
-
-  it 'should have a formatForState function', ->
-    expect(@makeup.formatForState).toBeDefined()
-
-  it 'should call formatForState upon initiation', ->
-    d = document.createElement "input"
-    spyOn(@makeup,"formatForState")
-    @makeup.constructor("state", d)
-    expect(@makeup.formatForState).toHaveBeenCalled()
-
-  it 'should set the format variable to "state"', ->
-    expect(@makeup.format).toBe("state")
+    input = document.createElement 'input'
+    @makeup = new MakeUp.State(input)
 
   it 'should set the placeholder to MN', ->
-    expect(@makeup.el.placeholder).toBe("MN")
+    expect(@makeup.el.placeholder).toBe 'MN'
 
-  it 'should not over-ride a placeholder', ->
-    @makeup.el.placeholder = "HA"
-    @makeup.formatForState()
-    expect(@makeup.el.placeholder).toBe("HA")
+  it 'should have a format of state', ->
+    expect(@makeup.format).toBe 'state'
 
-  it 'should autocapitalize letters', ->
-    spyOn(String.prototype,"toUpperCase")
-    $(@makeup.el).trigger(@e)
-    expect(String.prototype.toUpperCase).toHaveBeenCalled()
+  it 'should have limit of 2', ->
+    expect(@makeup.limit).toBe 2
 
-  it 'should only accept letters', ->
-    @e.which = 48
-    spyOn(String.prototype,"toUpperCase")
-    $(@makeup.el).trigger(@e)
-    expect(String.prototype.toUpperCase).not.toHaveBeenCalled()
+  it 'should accept capital chars', ->
+    chars = ['A','B','Z','Q']
+    for char in chars
+      @makeup.key = char
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBeTruthy()
 
-  it 'should store the current data in a variable when the metakey is pressed', ->
-    @makeup.el.value = "abc"
-    e = $.Event("keydown")
-    e.metaKey = true
-    $(@makeup.el).trigger(e)
-    expect(@makeup.currVal).toBe("abc")
+  it 'should not accept lowercase chars or other chars', ->
+    chars = [1, '.', ',', ' ']
+    for char in chars
+      @makeup.key = char
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBe false
 
-  it 'should call validate paste when the metakey is keyup', ->
-    e = $.Event("keyup")
-    e.metaKey = true
-    spyOn(@makeup,"allowDefaults")
-    $(@makeup.el).trigger(e)
-    expect(@makeup.allowDefaults).toHaveBeenCalledWith(e)
+  it 'should validate to be just two uppercase chars', ->
+    values = ['AZ', 'MN', 'NM']
+    for value in values
+      @makeup.value = value
+      @makeup.validate()
+      expect(@makeup.value).toBe value
 
+  it 'should fail 3+ chars, non caps, and numbers', ->
+    values = ['az', 23, 'a', '>2']
+    spyOn(window, 'alert').andReturn false
+    for value in values
+      @makeup.el.value = value
+      @makeup.validate()
+      expect(@makeup.el.value).toBe ''
 
+  it 'should upeercase on each char', ->
+    @makeup.key = 'a'
+    @makeup.keydown()
+    expect(@makeup.key).toBe 'A'

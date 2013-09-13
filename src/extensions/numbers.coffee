@@ -18,20 +18,21 @@
 
 class MakeUp.Numbers extends MakeUp
 
+  format: 'numbers'
+
   #
   ## constructor: ->
 
-  constructor: (@el, options = '') ->
-    @format = "numbers"
+  constructor: (@el) ->
     @bindEvents()
 
   #
   ## keydown: ->
 
-  keydown: (key) ->
+  keydown: () ->
     @shouldApply = false
-    @acceptedChars(/[0-9]/, key)
-    @applyChar(key)
+    @acceptedChars(/[0-9]/)
+    @applyChar()
 
   #
   ## validate: ->

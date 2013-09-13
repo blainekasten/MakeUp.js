@@ -18,22 +18,17 @@
 
 class MakeUp.State extends MakeUp
 
-  #
-  ## constructor: ->
-
-  constructor: (@el) ->
-    @setPlaceholder('MN')
-    @format = 'state'
-    @limit = 2
-    @bindEvents()
+  placeholder: 'MN'
+  format: 'state'
+  limit: 2
 
   #
   ## keydown: ->
 
-  keydown: (key) ->
-    ey = @uppercaseChar(key)
-    @acceptedChars(/[A-Z]/, key)
-    @applyChar(key)
+  keydown: ->
+    @key = @uppercaseChar(@key)
+    @acceptedChars(/[A-Z]/)
+    @applyChar()
 
   #
   ## validate: ->
@@ -47,6 +42,6 @@ class MakeUp.State extends MakeUp
   ## uppercaseChar: ->
   ## This will uppercase the users entered key.
 
-  uppercaseChar: (key) ->
-    if /[a-zA-Z]/.test(key) and key != undefined
-      key.toUpperCase()
+  uppercaseChar: ->
+    if /[a-zA-Z]/.test(@key) and @key != undefined
+      @key.toUpperCase()

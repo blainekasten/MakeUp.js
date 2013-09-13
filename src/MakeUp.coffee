@@ -20,17 +20,14 @@
 class window.MakeUp
   keyMap: {65:'a', 66:'b', 67:'c', 68:'d', 69:'e', 70:'f', 71:'g', 72:'h', 73:'i', 74:'j', 75:'k', 76:'l', 77:'m', 78:'n', 79:'o', 80:'p', 81:'q', 82:'r', 83:'s', 84:'t', 85:'u', 86:'v', 87:'w', 88:'x', 89:'y', 90:'z', 48:0, 49:1, 50:2, 51:3, 52:4, 53:5, 54:6, 55:7, 56:8, 57:9, 96:0, 97:1, 98:2, 99:3, 100:4, 101:5, 102:6, 103:7, 104:8, 105:9, 190:'.', 191:'/', 111:'/', 8:"delete", 37:"left", 39:"right", 91:"cmd", 9:"tab", 16:"shift"}
   format: ''
+  placeholder: ''
 
   #
   ## constructor: ->
 
-  constructor: (inputType, @el) ->
-    switch inputType
-      when "phone" then new MakeUp.Phone(@el)
-      when "date" then new MakeUp.Date(@el)
-      when "numbers" then new MakeUp.Numbers(@el)
-      when "email" then new MakeUp.Email(@el)
-      when "state" then new MakeUp.State(@el)
+  constructor: (@el) ->
+    @setPlaceholder()
+    @bindEvents()
 
   #
   ## bindEvents: ->
@@ -41,9 +38,10 @@ class window.MakeUp
       unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
         e.preventDefault()
         @shouldApply = false
-        @keydown(@keyMap[e.which])
+        @key = @keyMap[e.which]
+        @keydown()
     @el.onkeyup = (e) =>
-      @keyup(@keyMap[e.which])
+      @keyup()
     @el.onblur = (e) =>
       @blur(e)
 
@@ -52,6 +50,7 @@ class window.MakeUp
   ## This will be deprecated in a future version
 
   modifyData: (modifyType, resetText = "") ->
+    console.log 'This will deprecated in a future version. Do not call this method.'
     @el.blur()
     switch modifyType
       when "reset" then @el.value = resetText
@@ -65,19 +64,18 @@ class window.MakeUp
   ## placeholder = string for what the placeholder should default to
   ##            (this is typically an indicator of what the field should accept)
 
-  setPlaceholder: (placeholder) ->
-    @el.placeholder = placeholder if @el.placeholder is ""
+  setPlaceholder: ->
+    @el.placeholder = @placeholder if @el.placeholder is ""
 
   #
   ## acceptedCharsAtIndex: ->
   ## regex = regex of acceptable chars
   ## index = int of string placement
-  ## key = key that was pressed
 
-  acceptedCharsAtIndex: (regex, index, key) ->
+  acceptedCharsAtIndex: (regex, index) ->
     currIndex = index.toArray().includes(@el.value.length)
 
-    if currIndex and regex.test(key)
+    if currIndex and regex.test(@key)
       @shouldApply = true
     else
       @shouldApply = false
@@ -86,10 +84,9 @@ class window.MakeUp
   #
   ## acceptedChars: ->
   ## regex = regex of acceptable characters
-  ## key = key that was pressed
 
-  acceptedChars: (regex, key) ->
-    if regex.test(key)
+  acceptedChars: (regex) ->
+    if regex.test(@key)
       @shouldApply = true
     else @shouldApply = false
 
@@ -111,9 +108,9 @@ class window.MakeUp
   ## applyChar: ->
   ## The final step in a makeup object
 
-  applyChar: (key) ->
+  applyChar: ->
     unless @el.value.length >= @limit
-      @el.value += key if @shouldApply is true 
+      @el.value += @key if @shouldApply is true 
 
   #
   ## alwaysAcceptableKeys: ->

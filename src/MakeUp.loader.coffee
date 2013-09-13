@@ -31,7 +31,12 @@ class window.MakeUpLoader
     arrayOfInputElements = document.getElementsByTagName('input')
     for element in arrayOfInputElements
       inputType = element.getAttribute('data-format')
-      new window.MakeUp(inputType, element)
+      switch inputType
+        when "phone" then new MakeUp.Phone(element)
+        when "date" then new MakeUp.Date(element)
+        when "numbers" then new MakeUp.Numbers(element)
+        when "email" then new MakeUp.Email(element)
+        when "state" then new MakeUp.State(element)
 
 
 #

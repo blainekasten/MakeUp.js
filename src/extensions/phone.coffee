@@ -18,27 +18,22 @@
 
 class MakeUp.Phone extends MakeUp
 
-  #
-  ## constructor: ->
-
-  constructor: (@el) ->
-    @format = "phone"
-    @limit = 12
-    @setPlaceholder('000-000-0000')
-    @bindEvents()
+  format:  "phone"
+  placeholder: '000-000-0000'
+  limit: 12
 
   #
   ## keydown: ->
 
-  keydown: (key) ->
-    @acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key)
-    @applyChar(key)
+  keydown: ->
+    @acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12')
+    @applyChar()
 
   #
   ## keyup: ->
 
-  keyup: (key) ->
-    unless key is 'delete'
+  keyup: ->
+    unless @key is 'delete'
       @insertCharsAtIndex('-', [3,7])
 
   #

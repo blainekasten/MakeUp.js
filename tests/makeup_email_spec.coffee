@@ -1,50 +1,24 @@
-describe 'Email format', ->
+describe 'MakeUp.Email', ->
   beforeEach ->
-    @e = $.Event("keydown")
-    @e.which = 49
-    eEL = document.createElement "input"
-    eEL.data-format = "email"
-    document.documentElement.appendChild eEL
-    @makeup = new MakeUp("email", eEL)
+    input = document.createElement 'input'
+    @makeup = new MakeUp.Email(input)
 
-  it 'should have a formatForEmail function', ->
-    spyOn(@makeup,"formatForEmail")
-    expect(@makeup.formatForEmail).toBeDefined()
+  it 'should accept any character', ->
+    chars = ['a',',','@','%','&',1,9]
+    for char in chars
+      @makeup.key = char
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBe true
 
-  it 'should call formatForEmail automatically', ->
-    d = document.createElement "input"
-    spyOn(@makeup,"formatForEmail")
-    @makeup.constructor("email", d)
-    expect(@makeup.formatForEmail).toHaveBeenCalled()
+  it 'should pass validation on blainekastne@gmail.com', ->
+    @makeup.el.value = 'blainekasten@gmail.com'
+    @makeup.validate()
+    expect(@makeup.el.value).toBe 'blainekasten@gmail.com'
 
-  it 'should set the format variable to "email"', ->
-    expect(@makeup.format).toBe("email")
-
-  it 'should set the placeholder if none is defined', ->
-    expect(@makeup.el.placeholder).toBe("user@domain.com")
-
-  it 'should not over-ride a manually set placeholder', ->
-    el = document.createElement "input"
-    el.placeholder = "test"
-    makeup = new MakeUp("email", el)
-    expect(makeup.el.placeholder).toBe("test")
-
-  it 'should place the @ symbol in the value if a key is pressed when the field is empty', ->
-    @makeup.el.value = ""
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toBe("@")
-
-  it 'should keep a storage of the current text when hittting delete', ->
-    @e.which = 8
-    @makeup.el.value = "hey"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.currVal).toBe("hey")
-
-  it 'should undo the delete if the delete removes the @', ->
-    @makeup.currVal = "user@mango.com"
-    @makeup.el.value = "user"
-    e = $.Event("keyup")
-    e.which = 8
-    spyOn(@makeup,"modifyData")
-    $(@makeup.el).trigger(e)
-    expect(@makeup.modifyData).toHaveBeenCalledWith("reset", "user@mango.com")
+  it 'should fail validation if the @ symbol is missing, if the period is missing, or the extension isnt correct', ->
+    emails = ['blaine2gmail.com', 'blaiune@gmailcom', 'blaine@gmail.co']
+    spyOn(window, 'alert').andReturn(true)
+    for email in emails
+      @makeup.el.value = email
+      @makeup.validate()
+      expect(@makeup.el.value).toBe ''

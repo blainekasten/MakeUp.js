@@ -19,7 +19,8 @@
 
 
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var _ref, _ref1, _ref2, _ref3,
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   window.MakeUp = (function() {
@@ -83,24 +84,12 @@
 
     MakeUp.prototype.format = '';
 
-    function MakeUp(inputType, el) {
+    MakeUp.prototype.placeholder = '';
+
+    function MakeUp(el) {
       this.el = el;
-      switch (inputType) {
-        case "phone":
-          new MakeUp.Phone(this.el);
-          break;
-        case "date":
-          new MakeUp.Date(this.el);
-          break;
-        case "numbers":
-          new MakeUp.Numbers(this.el);
-          break;
-        case "email":
-          new MakeUp.Email(this.el);
-          break;
-        case "state":
-          new MakeUp.State(this.el);
-      }
+      this.setPlaceholder();
+      this.bindEvents();
     }
 
     MakeUp.prototype.bindEvents = function() {
@@ -109,11 +98,12 @@
         if (!(_this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
           e.preventDefault();
           _this.shouldApply = false;
-          return _this.keydown(_this.keyMap[e.which]);
+          _this.key = _this.keyMap[e.which];
+          return _this.keydown();
         }
       };
       this.el.onkeyup = function(e) {
-        return _this.keyup(_this.keyMap[e.which]);
+        return _this.keyup();
       };
       return this.el.onblur = function(e) {
         return _this.blur(e);
@@ -125,6 +115,7 @@
       if (resetText == null) {
         resetText = "";
       }
+      console.log('This will deprecated in a future version. Do not call this method.');
       this.el.blur();
       switch (modifyType) {
         case "reset":
@@ -138,24 +129,24 @@
       }), 300);
     };
 
-    MakeUp.prototype.setPlaceholder = function(placeholder) {
+    MakeUp.prototype.setPlaceholder = function() {
       if (this.el.placeholder === "") {
-        return this.el.placeholder = placeholder;
+        return this.el.placeholder = this.placeholder;
       }
     };
 
-    MakeUp.prototype.acceptedCharsAtIndex = function(regex, index, key) {
+    MakeUp.prototype.acceptedCharsAtIndex = function(regex, index) {
       var currIndex;
       currIndex = index.toArray().includes(this.el.value.length);
-      if (currIndex && regex.test(key)) {
+      if (currIndex && regex.test(this.key)) {
         return this.shouldApply = true;
       } else {
         return this.shouldApply = false;
       }
     };
 
-    MakeUp.prototype.acceptedChars = function(regex, key) {
-      if (regex.test(key)) {
+    MakeUp.prototype.acceptedChars = function(regex) {
+      if (regex.test(this.key)) {
         return this.shouldApply = true;
       } else {
         return this.shouldApply = false;
@@ -182,10 +173,10 @@
       }
     };
 
-    MakeUp.prototype.applyChar = function(key) {
+    MakeUp.prototype.applyChar = function() {
       if (!(this.el.value.length >= this.limit)) {
         if (this.shouldApply === true) {
-          return this.el.value += key;
+          return this.el.value += this.key;
         }
       }
     };
@@ -237,7 +228,25 @@
       for (_i = 0, _len = arrayOfInputElements.length; _i < _len; _i++) {
         element = arrayOfInputElements[_i];
         inputType = element.getAttribute('data-format');
-        _results.push(new window.MakeUp(inputType, element));
+        switch (inputType) {
+          case "phone":
+            _results.push(new MakeUp.Phone(element));
+            break;
+          case "date":
+            _results.push(new MakeUp.Date(element));
+            break;
+          case "numbers":
+            _results.push(new MakeUp.Numbers(element));
+            break;
+          case "email":
+            _results.push(new MakeUp.Email(element));
+            break;
+          case "state":
+            _results.push(new MakeUp.State(element));
+            break;
+          default:
+            _results.push(void 0);
+        }
       }
       return _results;
     };
@@ -255,7 +264,7 @@
    @{#}Version:       1.1.1
    @{#}Last Updated:  sept 12, 2013
    @{#}Purpose:       Provide date formatting to input fields
-   @{#}Author:        Blaine Kasten
+   @{#}Author:        Blaine Kasten (http://www.github.com/blainekasten)
    @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
                       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
                       OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
@@ -272,22 +281,25 @@
   MakeUp.Date = (function(_super) {
     __extends(Date, _super);
 
-    function Date(el) {
-      this.el = el;
-      this.setPlaceholder('01/31/1971');
-      this.format = 'date';
-      this.limit = 10;
-      this.bindEvents();
+    function Date() {
+      _ref = Date.__super__.constructor.apply(this, arguments);
+      return _ref;
     }
 
-    Date.prototype.keydown = function(key) {
-      this.acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key);
-      return this.applyChar(key);
+    Date.prototype.format = 'date';
+
+    Date.prototype.limit = 10;
+
+    Date.prototype.placeholder = '01/31/1971';
+
+    Date.prototype.keydown = function() {
+      this.acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10');
+      return this.applyChar();
     };
 
-    Date.prototype.keyup = function(key) {
-      this.easeUse(key);
-      if (key !== 'delete') {
+    Date.prototype.keyup = function() {
+      this.easeUse();
+      if (this.key !== 'delete') {
         return this.insertCharsAtIndex('/', [2, 5]);
       }
     };
@@ -319,21 +331,23 @@
       };
       if (month > 12) {
         alert("There isn't a month higher than 12");
-        this.modifyData("clear");
-      }
-      if (date > daysInMonths[month]) {
+        return this.el.value = '';
+      } else if (date > daysInMonths[month]) {
         alert("That is not a valid day for this month");
-        return this.modifyData("clear");
+        return this.el.value = '';
+      } else if (/[0-1]{1}[0-2]{1}\/[0-3]{1}[0-9]{1}\/[1-2]{1}[0-9]{3}/.test(this.el.value) === false && this.el.value.length > 0) {
+        alert("The date format is not correct. Please try again.");
+        return this.el.value = '';
       }
     };
 
-    Date.prototype.easeUse = function(key) {
+    Date.prototype.easeUse = function() {
       var val;
       val = this.el.value;
       if (val.length === 1) {
-        if (/[2-9]/.test(key)) {
+        if (/[2-9]/.test(this.key)) {
           return this.el.value = "0" + val;
-        } else if (key === '/') {
+        } else if (this.key === '/') {
           return this.el.value = "0" + val + "/";
         }
       } else if (val.length === 2) {
@@ -369,12 +383,14 @@
   MakeUp.Email = (function(_super) {
     __extends(Email, _super);
 
-    function Email(el) {
-      this.el = el;
-      this.format = "email";
-      this.setPlaceholder("user@domain.com");
-      this.bindEvents();
+    function Email() {
+      _ref1 = Email.__super__.constructor.apply(this, arguments);
+      return _ref1;
     }
+
+    Email.prototype.format = 'email';
+
+    Email.prototype.placeholder = 'user@domain.com';
 
     Email.prototype.keydown = function(key) {
       this.shouldApply = true;
@@ -418,19 +434,17 @@
   MakeUp.Numbers = (function(_super) {
     __extends(Numbers, _super);
 
-    function Numbers(el, options) {
+    Numbers.prototype.format = 'numbers';
+
+    function Numbers(el) {
       this.el = el;
-      if (options == null) {
-        options = '';
-      }
-      this.format = "numbers";
       this.bindEvents();
     }
 
-    Numbers.prototype.keydown = function(key) {
+    Numbers.prototype.keydown = function() {
       this.shouldApply = false;
-      this.acceptedChars(/[0-9]/, key);
-      return this.applyChar(key);
+      this.acceptedChars(/[0-9]/);
+      return this.applyChar();
     };
 
     Numbers.prototype.validate = function() {
@@ -466,21 +480,24 @@
   MakeUp.Phone = (function(_super) {
     __extends(Phone, _super);
 
-    function Phone(el) {
-      this.el = el;
-      this.format = "phone";
-      this.limit = 12;
-      this.setPlaceholder('000-000-0000');
-      this.bindEvents();
+    function Phone() {
+      _ref2 = Phone.__super__.constructor.apply(this, arguments);
+      return _ref2;
     }
 
-    Phone.prototype.keydown = function(key) {
-      this.acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12', key);
-      return this.applyChar(key);
+    Phone.prototype.format = "phone";
+
+    Phone.prototype.placeholder = '000-000-0000';
+
+    Phone.prototype.limit = 12;
+
+    Phone.prototype.keydown = function() {
+      this.acceptedCharsAtIndex(/[0-9]/, '0-2,4-6,8-12');
+      return this.applyChar();
     };
 
-    Phone.prototype.keyup = function(key) {
-      if (key !== 'delete') {
+    Phone.prototype.keyup = function() {
+      if (this.key !== 'delete') {
         return this.insertCharsAtIndex('-', [3, 7]);
       }
     };
@@ -518,19 +535,21 @@
   MakeUp.State = (function(_super) {
     __extends(State, _super);
 
-    function State(el) {
-      this.el = el;
-      this.setPlaceholder('MN');
-      this.format = 'state';
-      this.limit = 2;
-      this.bindEvents();
+    function State() {
+      _ref3 = State.__super__.constructor.apply(this, arguments);
+      return _ref3;
     }
 
-    State.prototype.keydown = function(key) {
-      var ey;
-      ey = this.uppercaseChar(key);
-      this.acceptedChars(/[A-Z]/, key);
-      return this.applyChar(key);
+    State.prototype.placeholder = 'MN';
+
+    State.prototype.format = 'state';
+
+    State.prototype.limit = 2;
+
+    State.prototype.keydown = function() {
+      this.key = this.uppercaseChar(this.key);
+      this.acceptedChars(/[A-Z]/);
+      return this.applyChar();
     };
 
     State.prototype.validate = function() {
@@ -540,9 +559,9 @@
       }
     };
 
-    State.prototype.uppercaseChar = function(key) {
-      if (/[a-zA-Z]/.test(key) && key !== void 0) {
-        return key.toUpperCase();
+    State.prototype.uppercaseChar = function() {
+      if (/[a-zA-Z]/.test(this.key) && this.key !== void 0) {
+        return this.key.toUpperCase();
       }
     };
 
@@ -559,11 +578,11 @@
   };
 
   String.prototype.toArray = function() {
-    var i, indices, j, max, min, split, _i, _j, _len, _ref;
+    var i, indices, j, max, min, split, _i, _j, _len, _ref4;
     indices = [];
-    _ref = this.split(/,/);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      i = _ref[_i];
+    _ref4 = this.split(/,/);
+    for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+      i = _ref4[_i];
       split = i.split(/-/);
       min = Number(split[0]);
       max = Number(split[1]);

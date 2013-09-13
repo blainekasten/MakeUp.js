@@ -1,105 +1,71 @@
-describe 'Date format', ->
+describe 'MakeUp.Date', ->
   beforeEach ->
-    @e = $.Event("keydown")
-    @e.which = 49
-    dEl = document.createElement "input"
-    dEl.data-format = "date"
-    document.documentElement.appendChild dEl
-    @makeup = new MakeUp("date", dEl)
-    spyOn(@makeup, 'formatForDate')
-    spyOn(@makeup, 'validateDate').andCallThrough()
+    input = document.createElement 'input'
+    @makeup = new MakeUp.Date(input)
 
-  it 'should be defined', ->
-    expect(@makeup).toBeDefined()
+  it 'should set the placeholder to 01/31/1971', ->
+    expect(@makeup.el.placeholder).toBe '01/31/1971'
 
-  it 'should have a date format function', ->
-    expect(@makeup.formatForDate).toBeDefined()
+  it 'should have a format of date', ->
+    expect(@makeup.format).toBe 'date'
 
-  it 'should call formatForDate', ->
-    d = document.createElement "input"
-    @makeup.constructor("date", d)
-    expect(@makeup.formatForDate).toHaveBeenCalled()
+  it 'should have limit of 10', ->
+    expect(@makeup.limit).toBe 10
 
-  it 'should set the format variable to "date"', ->
-    expect(@makeup.format).toBe("date")
+  it 'should accept 0-9 chars at indexes 0-1,3-4,6-10', ->
+    strs = ['03291990', '1201990', '12292010']
+    for str in strs
+      for char in str
+        @makeup.key = char
+        @makeup.keydown()
+        expect(@makeup.shouldApply).toBe true
+        @makeup.keyup()
 
-  it 'should have a placeholder 01/01/1971 when there is no placeholder', ->
-    expect(@makeup.el.placeholder).toBe("01/01/1971")
+  it 'should only not allow non-numeric keys', ->
+    arr = ['a',',','#','*','~',' ']
+    for num in arr
+      @makeup.el.value = ''
+      @makeup.key = num
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBe false 
 
-  it 'should not override a placeholder that is manually set', ->
-    dEl = document.createElement "input"
-    dEl.data-format = "date"
-    dEl.placeholder = "03/03/2012"
-    document.documentElement.appendChild dEl
-    makeup = new MakeUp("phone", dEl)
-    expect(makeup.el.placeholder).toBe("03/03/2012")
+  it 'should call easeUse on keyup', ->
+    spyOn(@makeup, 'easeUse')
+    @makeup.keyup()
+    expect(@makeup.easeUse).toHaveBeenCalled()
 
-  it 'should allow numbers', ->
-    keyArray = [48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105]
-    for key in keyArray
-      @makeup.el.value = "02"
-      @e.which = key
-      $(@makeup.el).trigger(@e)
-      expect(@makeup.el.value).toEqual("02/")
+  it 'should insert /s at indexes 2', ->
+    @makeup.el.value = '02'
+    @makeup.key = 1
+    @makeup.keyup()
+    expect(@makeup.el.value).toBe '02/'
 
-  it 'should append a "/" when the length is 2', ->
-    @makeup.el.value = "02"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("02/")
+  it 'should insert /s at indexes 5', ->
+    @makeup.el.value = '02/02'
+    @makeup.key = 1
+    @makeup.keyup()
+    expect(@makeup.el.value).toBe '02/02/'
 
-  it 'should append a "/" when the length is 5', ->
-    @makeup.el.value = "02/02"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("02/02/")
-  
-  it 'should not accept more characters when length is 12', ->
-    @makeup.el.value = "02/02/2012"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("02/02/2012")
+  it 'should validate month not being greater than 13', ->
+    @makeup.el.value = '13/29/1990'
+    spyOn(window, 'alert')
+    @makeup.validate()
+    expect(window.alert).toHaveBeenCalledWith("There isn't a month higher than 12")
 
-  it 'should call allowDefaults when the metaKey is pressed', ->
-    spyOn(@makeup, 'allowDefaults')
-    e = $.Event('keydown')
-    e.metaKey = true
-    $(@makeup.el).trigger(e)
-    expect(@makeup.allowDefaults).toHaveBeenCalledWith(e)
+  it 'should validate february for leap year', ->
+    @makeup.el.value = '02/29/1997' #not leap year
+    spyOn(window, 'alert')
+    @makeup.validate()
+    expect(window.alert).toHaveBeenCalledWith("That is not a valid day for this month")
 
-  it 'should not accept letters entered', -> 
-    @makeup.el.value = "02"
-    @e.which = 44 
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("02")
+  it 'should pass the 01/31/1990 format', ->
+    @makeup.el.value = '01/31/1990'
+    spyOn(window, 'alert')
+    @makeup.validate()
+    expect(window.alert).not.toHaveBeenCalled()
 
-  it 'should call validateDate() on blur', ->
-    $(@makeup.el).focus()
-    $(@makeup.el).blur()
-    expect(@makeup.validateDate).toHaveBeenCalled()
-
-  describe 'validateDate()', ->
-
-    it 'is defined', ->
-      expect(@makeup.validateDate).toBeDefined()
-
-    it 'alerts if the month is greater than 12', ->
-      @makeup.el.value = "13/01/2013"
-      spyOn(window,"alert")
-      @makeup.validateDate()
-      expect(alert).toHaveBeenCalled()
-
-    it 'calls modifyData("clear") when the month is greater than 12', ->
-      @makeup.el.value = "13/13/2013"
-      spyOn(@makeup,"modifyData")
-      @makeup.validateDate()
-      expect(@makeup.modifyData).toHaveBeenCalledWith("clear")
-
-    it 'alerts if the day is higher than it should be for the month', ->
-      @makeup.el.value = '02/29/2013'
-      spyOn(window,"alert")
-      @makeup.validateDate()
-      expect(alert).toHaveBeenCalled()
-
-    it 'calls modifyData("Clear")when the day is higher than it should be for the month', ->
-      @makeup.el.value = '02/29/2013'
-      spyOn(@makeup,"modifyData")
-      @makeup.validateDate()
-      expect(@makeup.modifyData).toHaveBeenCalledWith("clear")
+  it 'should fail for 10/30/3000 format', ->
+    @makeup.el.value = '10/30/3000'
+    spyOn(window, 'alert')
+    @makeup.validate()
+    expect(window.alert).toHaveBeenCalledWith('The date format is not correct. Please try again.')

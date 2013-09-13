@@ -18,13 +18,8 @@
 
 class MakeUp.Email extends MakeUp
 
-  #
-  ## constructor: ->
-
-  constructor: (@el) ->
-    @format = "email"
-    @setPlaceholder("user@domain.com")
-    @bindEvents()
+  format: 'email'
+  placeholder: 'user@domain.com'
 
   #
   ## keydown: ->

@@ -3,7 +3,7 @@
  @{#}Version:       1.1.1
  @{#}Last Updated:  sept 12, 2013
  @{#}Purpose:       Provide date formatting to input fields
- @{#}Author:        Blaine Kasten
+ @{#}Author:        Blaine Kasten (http://www.github.com/blainekasten)
  @{#}Copyright:     MIT License (MIT) Copyright (c) 2013 Blaine Kasten
                     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
                     OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
@@ -18,32 +18,27 @@
 
 class MakeUp.Date extends MakeUp
 
-  #
-  ## Constructor 
-
-  constructor: (@el) ->
-    @setPlaceholder('01/31/1971')
-    @format = 'date'
-    @limit = 10
-    @bindEvents()
+  format: 'date'
+  limit: 10
+  placeholder: '01/31/1971'
 
   #
   ## keydown: ->
 
-  keydown: (key) ->
-    @acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10', key)
-    @applyChar(key)
+  keydown: ->
+    @acceptedCharsAtIndex(/[0-9]/, '0-1,3-4,6-10')
+    @applyChar()
 
   #
   ## keyup: ->
 
-  keyup: (key) ->
-    @easeUse(key)
-    unless key is 'delete'
+  keyup: ->
+    @easeUse()
+    unless @key is 'delete'
       @insertCharsAtIndex('/', [2,5])
 
   #
-  ## validate()
+  ## validate: ->
 
   validate: ->
     text = @el.value
@@ -59,21 +54,24 @@ class MakeUp.Date extends MakeUp
     daysInMonths = {1:31, 2:februaryDays, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
     if month > 12
       alert("There isn't a month higher than 12")
-      @modifyData("clear")
-    if date > daysInMonths[month]
+      @el.value = ''
+    else if date > daysInMonths[month]
       alert("That is not a valid day for this month")
-      @modifyData("clear")
+      @el.value = ''
+    else if /[0-1]{1}[0-2]{1}\/[0-3]{1}[0-9]{1}\/[1-2]{1}[0-9]{3}/.test(@el.value) is false and @el.value.length > 0
+      alert("The date format is not correct. Please try again.")
+      @el.value = ''
 
   #
   ## easeUse: ->
-  ## Conditionals for how each key should react
+  ## Conditionals for how keys should react at different indexes
 
-  easeUse: (key) ->
+  easeUse: ->
     val = @el.value
     if val.length is 1
-      if /[2-9]/.test(key) 
+      if /[2-9]/.test(@key) 
         @el.value = "0#{val}"
-      else if key is '/'
+      else if @key is '/'
         @el.value = "0#{val}/"
 
     else if val.length is 2

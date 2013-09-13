@@ -45,6 +45,8 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['karma:test'])
   grunt.registerTask('develop', ['karma:unit', 'watch:coffee'])
   grunt.registerTask('ugly', ['uglify:min'])
+  grunt.registerTask('compile', ['coffee:compile', 'uglify:min'])
+
 }
 
 

@@ -1,73 +1,43 @@
-describe 'Phone format', ->
+describe 'MakeUp.Phone', ->
   beforeEach ->
-    @e = $.Event("keydown")
-    @e.which = 49
-    phoneElement = document.createElement "input"
-    phoneElement.data-format = "phone"
-    document.documentElement.appendChild phoneElement
-    @makeup = new MakeUp("phone", phoneElement)
-    spyOn(@makeup, 'formatForPhone')
+    input = document.createElement 'input'
+    @makeup = new MakeUp.Phone(input)
 
-  it 'should be defined', ->
-    expect(@makeup).toBeDefined()
+  it 'should set the placeholder to 000-000-0000', ->
+    expect(@makeup.el.placeholder).toBe '000-000-0000'
 
-  it 'should have a phone format method', ->
-    expect(@makeup.formatForPhone).toBeDefined()
+  it 'should have a format of phone', ->
+    expect(@makeup.format).toBe 'phone'
 
-  it 'should call formatForPhone', ->
-    p = document.createElement "input"
-    @makeup.constructor("phone", p)
-    expect(@makeup.formatForPhone).toHaveBeenCalled()
-  
-  it 'should set the format variable to "phone"', ->
-    expect(@makeup.format).toBe("phone")
+  it 'should have a limit of 12 chars', ->
+    expect(@makeup.limit).toBe 12
 
-  it 'should have a placeholder of 000-000-0000 when there is no placeholder', ->
-    expect(@makeup.el.placeholder).toBe("000-000-0000")
+  it 'should accept 0-9 chars at indexes 0-2,4-6,8-12', ->
+    strs = ['3205872910', '4028418175', '1118675309']
+    for str in strs
+      for char in str
+        @makeup.key = char
+        @makeup.keydown()
+        expect(@makeup.shouldApply).toBe true
+        @makeup.keyup()
 
-  it 'should not override a placeholder that is manually set', ->
-    phoneElement = document.createElement "input"
-    phoneElement.data-format = "phone"
-    phoneElement.placeholder = "999-867-5309"
-    document.documentElement.appendChild phoneElement
-    makeup = new MakeUp("phone", phoneElement)
-    expect(makeup.el.placeholder).toBe("999-867-5309")
+  it 'inserts - at index 3', ->
+    @makeup.el.value = '333'
+    @makeup.el.key = 2
+    @makeup.keyup()
+    expect(@makeup.el.value).toBe '333-'
 
-  it 'should allow numbers', ->
-    keyArray = [48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105]
-    for key in keyArray
-      @makeup.el.value = "111"
-      @e.which = key
-      $(@makeup.el).trigger(@e)
-      expect(@makeup.el.value).toEqual("111-")
+  it 'allows a format of 402-841-8175', ->
+    strs = ['320-587-2910', '402-841-8175', '111-867-5309']
+    for str in strs
+      @makeup.el.value = str
+      @makeup.validate()
+      expect(@makeup.el.value).toBe str
 
-  it 'should append a "-" when the length is 3', ->
-    @makeup.el.value = "111"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("111-")
-  
-  it 'should append a "-" when the length is 7', ->
-    @makeup.el.value = "111-111"
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("111-111-")
-
-  it 'should not accept more characters when length is 12', ->
-    @makeup.el.value = "111-111-1111"
-    e = $.Event("keydown")
-    e.which = 49
-    $(@makeup.el).trigger(e)
-    expect(@makeup.el.value).toEqual("111-111-1111")
-
-  it 'should call _allowDefaults when the metaKey is pressed', ->
-    spyOn(@makeup, 'allowDefaults')
-    @e.which = null #set the key to null so it passes other if statements
-    @e.metaKey = true
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.allowDefaults).toHaveBeenCalledWith(@e)
-
-  it 'should not accept letters entered', -> 
-    @makeup.el.value = "111"
-    @e.which = 44 
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.el.value).toEqual("111")
-
+  it 'should not accept formats of non xxx-xxx-xxxx', ->
+    strs = ['3205872910', '4028-841-175', '111.867.5309']
+    spyOn(window, 'alert').andReturn(false)
+    for str in strs
+      @makeup.el.value = str
+      @makeup.validate()
+      expect(@makeup.el.value).not.toBe str

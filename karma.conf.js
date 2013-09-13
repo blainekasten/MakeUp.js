@@ -8,7 +8,7 @@ logLevel = LOG_INFO;
 
 autoWatch = true;
 
-browsers = ['Safari']//, 'Firefox']//, 'PhantomJS'];
+browsers = ['Safari', 'Chrome', 'Firefox']//, 'Firefox']//, 'PhantomJS'];
   /*
     Chrome
     ChromeCanary
@@ -26,6 +26,9 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
   'libs/jquery.min.js',
+  'src/prototypes/string.coffee',
+  'src/MakeUp.loader.coffee',
+  'src/MakeUp.coffee',
   'src/**/*.coffee',
   'tests/*.coffee'
 ];

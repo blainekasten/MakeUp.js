@@ -1,28 +1,30 @@
-describe 'Date format -', ->
+describe 'MakeUp.Numbers', ->
   beforeEach ->
-    @e = $.Event("keydown")
-    nEl = document.createElement "input"
-    nEl.data-format = "numbers"
-    document.documentElement.appendChild nEl
-    @makeup = new MakeUp("numbers", nEl)
-    spyOn(@makeup, 'formatForNumbers')
+    input = document.createElement 'input'
+    @makeup = new MakeUp.Numbers(input)
 
-  it 'should be defined', ->
-    expect(@makeup).toBeDefined()
+  it 'should set its format to numbers', ->
+    expect(@makeup.format).toBe 'numbers'
 
-  it 'should have a numbers format function', ->
-    expect(@makeup.formatForNumbers).toBeDefined()
+  it 'should only allow characters on 0-9 keys', ->
+    arr = [0,1,2,3,4,5,6,7,8,9]
+    for num in arr
+      @makeup.key = num
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBe(true)
 
-  it 'should call formatForNumbers', ->
-    n = document.createElement "input"
-    @makeup.constructor("numbers", n)
-    expect(@makeup.formatForNumbers).toHaveBeenCalled()
+  it 'should not allow letters to post', ->
+    arr = 'abcdefghijklmnopqrstuvwxyz,./;[]+_)(*&^%$#@!'
+    for l in arr
+      @makeup.key = l
+      @makeup.keydown()
+      expect(@makeup.shouldApply).toBe(false)
 
-  it 'should set the format variable to "numbers"', ->
-    expect(@makeup.format).toBe("numbers")
+  it 'should have a validate function', ->
+    expect(@makeup.validate).toBeDefined()
 
-  it 'should call allowDefaults when the metaKey is pressed', ->
-    spyOn(@makeup, 'allowDefaults')
-    @e.metaKey = true
-    $(@makeup.el).trigger(@e)
-    expect(@makeup.allowDefaults).toHaveBeenCalledWith(@e)
+  it 'validate function shouldnt allow anything non-numeric', ->
+    @makeup.el.value = '1a2b'
+    spyOn(window, 'alert').andReturn(false)
+    @makeup.validate()
+    expect(@makeup.el.value).toBe ''
