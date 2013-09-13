@@ -16,11 +16,18 @@ An HTML5 compatible data formatting tool for input tags that is SUPER EASY to us
 <code><script src="js/MakeUp.min.js"></script></code>
 3. Set your input tags data-format!
 
+`<input data-format='xxxxxxxxxx' />`
+
 ## Currently we support:
 
-phone, date, numbers, numbers-with-decimals, email, state (all for 'merica formats)
+phone, date, numbers, email, state (all for 'merica formats)
 
 ##### Internationalization to come...
+
+# Help us MakeUp better!
+
+MakeUp.js has been designed to be easily extended and provide the tools to format in any way.
+Look at our [wiki](https://github.com/blainekasten/MakeUp.js/wiki/_pages) on contributing!
 
 # License
 
