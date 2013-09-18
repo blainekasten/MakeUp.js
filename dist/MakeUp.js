@@ -95,10 +95,11 @@
     MakeUp.prototype.bindEvents = function() {
       var _this = this;
       this.el.onkeydown = function(e) {
+        _this.key = _this.keyMap[e.which];
+        console.log(_this.key);
         if (!(_this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
           e.preventDefault();
           _this.shouldApply = false;
-          _this.key = _this.keyMap[e.which];
           return _this.keydown();
         }
       };
@@ -155,20 +156,22 @@
 
     MakeUp.prototype.insertCharsAtIndex = function(str, index) {
       var i, _i, _len, _results;
-      if (index instanceof Array) {
-        _results = [];
-        for (_i = 0, _len = index.length; _i < _len; _i++) {
-          i = index[_i];
-          if (this.el.value.length === i) {
-            _results.push(this.el.value += str);
-          } else {
-            _results.push(void 0);
+      if (this.key !== 'delete') {
+        if (index instanceof Array) {
+          _results = [];
+          for (_i = 0, _len = index.length; _i < _len; _i++) {
+            i = index[_i];
+            if (this.el.value.length === i) {
+              _results.push(this.el.value += str);
+            } else {
+              _results.push(void 0);
+            }
           }
-        }
-        return _results;
-      } else {
-        if (this.el.value.length === index) {
-          return this.el.value += str;
+          return _results;
+        } else {
+          if (this.el.value.length === index) {
+            return this.el.value += str;
+          }
         }
       }
     };
@@ -299,9 +302,7 @@
 
     Date.prototype.keyup = function() {
       this.easeUse();
-      if (this.key !== 'delete') {
-        return this.insertCharsAtIndex('/', [2, 5]);
-      }
+      return this.insertCharsAtIndex('/', [2, 5]);
     };
 
     Date.prototype.validate = function() {

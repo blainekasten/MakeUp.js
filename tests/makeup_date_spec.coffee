@@ -63,9 +63,3 @@ describe 'MakeUp.Date', ->
     spyOn(window, 'alert')
     @makeup.validate()
     expect(window.alert).not.toHaveBeenCalled()
-
-  it 'should fail for 10/30/3000 format', ->
-    @makeup.el.value = '10/30/3000'
-    spyOn(window, 'alert')
-    @makeup.validate()
-    expect(window.alert).toHaveBeenCalledWith('The date format is not correct. Please try again.')

@@ -34,8 +34,7 @@ class MakeUp.Date extends MakeUp
 
   keyup: ->
     @easeUse()
-    unless @key is 'delete'
-      @insertCharsAtIndex('/', [2,5])
+    @insertCharsAtIndex('/', [2,5])
 
   #
   ## validate: ->

@@ -35,10 +35,11 @@ class window.MakeUp
 
   bindEvents: ->
     @el.onkeydown = (e) =>
+      @key = @keyMap[e.which]
+      console.log @key
       unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
         e.preventDefault()
         @shouldApply = false
-        @key = @keyMap[e.which]
         @keydown()
     @el.onkeyup = (e) =>
       @keyup()
@@ -96,13 +97,14 @@ class window.MakeUp
   ## index = int or array of string placement
 
   insertCharsAtIndex: (str, index) ->
-    if index instanceof Array
-      for i in index
-        if @el.value.length == i
+    unless @key is 'delete'
+      if index instanceof Array
+        for i in index
+          if @el.value.length == i
+            @el.value += str 
+      else
+        if @el.value.length == index
           @el.value += str 
-    else
-      if @el.value.length == index
-        @el.value += str 
 
   #
   ## applyChar: ->
