@@ -515,9 +515,7 @@
     };
 
     Phone.prototype.keyup = function() {
-      if (this.key !== 'delete') {
-        return this.insertCharsAtIndex('-', [3, 7]);
-      }
+      return this.insertCharsAtIndex('-', [3, 7]);
     };
 
     Phone.prototype.validate = function() {
