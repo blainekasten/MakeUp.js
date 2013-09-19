@@ -63,3 +63,28 @@ describe 'MakeUp.Date', ->
     spyOn(window, 'alert')
     @makeup.validate()
     expect(window.alert).not.toHaveBeenCalled()
+
+  it 'should call fixYear when the length is 8', ->
+    spyOn(@makeup, 'fixYear')
+    @makeup.el.value = '01/02/29'
+    @makeup.easeUse()
+    expect(@makeup.fixYear).toHaveBeenCalled()
+
+  it 'should not change the year then the first 2 characters are 19 or 20', ->
+    arr = ['19', 20]
+    for year in arr
+      @makeup.el.value = "01/01/#{year}"
+      @makeup.fixYear()
+      expect(@makeup.el.value).toBe "01/01/#{year}"
+
+  it 'should append 19 when the first 2 characters of the year are greater than the currYears last 2 digits', ->
+    currYear = Number(String(new window.Date().getFullYear()).substring(2)) + 1
+    @makeup.el.value = "01/01/#{currYear}"
+    @makeup.fixYear()
+    expect(@makeup.el.value).toBe "01/01/19#{currYear}"
+
+  it 'should append 19 when the first 2 characters of the year are less than the currYears last 2 digits', ->
+    currYear = Number(String(new window.Date().getFullYear()).substring(2)) - 1
+    @makeup.el.value = "01/01/#{currYear}"
+    @makeup.fixYear()
+    expect(@makeup.el.value).toBe "01/01/20#{currYear}"

@@ -36,7 +36,6 @@ class window.MakeUp
   bindEvents: ->
     @el.onkeydown = (e) =>
       @key = @keyMap[e.which]
-      console.log @key
       unless @alwaysAcceptableKeys().includes(e.which) or e.metaKey
         e.preventDefault()
         @shouldApply = false

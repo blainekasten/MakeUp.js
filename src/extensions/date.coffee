@@ -58,7 +58,7 @@ class MakeUp.Date extends MakeUp
       alert("That is not a valid day for this month")
       @el.value = ''
     else if /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(@el.value) is false and @el.value.length > 0
-      alert("The date format is not correct. Please try again.")
+      alert("The date format is not correct. It must be mm/dd/yyyy.")
       @el.value = ''
 
   #
@@ -76,3 +76,21 @@ class MakeUp.Date extends MakeUp
     else if val.length is 2
       if val is '13'
         @el.value = "0#{val[0]}/#{val[1]}"
+
+    if val.length is 8 
+      @fixYear()
+
+  #
+  ## fixYear: ->
+  ## Appends the year for the user
+  
+  fixYear: ->
+    splitVal = @el.value.split('/')
+    year = splitVal[2]
+    unless year is '19' or year is '20'
+      currYear = Number(String(new window.Date().getFullYear()).substring(2))
+      if year > currYear
+        append = 19
+      else 
+        append = 20
+      @el.value = "#{splitVal[0]}/#{splitVal[1]}/#{append}#{year}"

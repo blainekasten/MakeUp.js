@@ -96,7 +96,6 @@
       var _this = this;
       this.el.onkeydown = function(e) {
         _this.key = _this.keyMap[e.which];
-        console.log(_this.key);
         if (!(_this.alwaysAcceptableKeys().includes(e.which) || e.metaKey)) {
           e.preventDefault();
           _this.shouldApply = false;
@@ -337,7 +336,7 @@
         alert("That is not a valid day for this month");
         return this.el.value = '';
       } else if (/[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(this.el.value) === false && this.el.value.length > 0) {
-        alert("The date format is not correct. Please try again.");
+        alert("The date format is not correct. It must be mm/dd/yyyy.");
         return this.el.value = '';
       }
     };
@@ -347,14 +346,32 @@
       val = this.el.value;
       if (val.length === 1) {
         if (/[2-9]/.test(this.key)) {
-          return this.el.value = "0" + val;
+          this.el.value = "0" + val;
         } else if (this.key === '/') {
-          return this.el.value = "0" + val + "/";
+          this.el.value = "0" + val + "/";
         }
       } else if (val.length === 2) {
         if (val === '13') {
-          return this.el.value = "0" + val[0] + "/" + val[1];
+          this.el.value = "0" + val[0] + "/" + val[1];
         }
+      }
+      if (val.length === 8) {
+        return this.fixYear();
+      }
+    };
+
+    Date.prototype.fixYear = function() {
+      var append, currYear, splitVal, year;
+      splitVal = this.el.value.split('/');
+      year = splitVal[2];
+      if (!(year === '19' || year === '20')) {
+        currYear = Number(String(new window.Date().getFullYear()).substring(2));
+        if (year > currYear) {
+          append = 19;
+        } else {
+          append = 20;
+        }
+        return this.el.value = "" + splitVal[0] + "/" + splitVal[1] + "/" + append + year;
       }
     };
 
