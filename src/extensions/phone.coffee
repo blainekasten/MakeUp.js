@@ -33,8 +33,7 @@ class MakeUp.Phone extends MakeUp
   ## keyup: ->
 
   keyup: ->
-    unless @key is 'delete'
-      @insertCharsAtIndex('-', [3,7])
+    @insertCharsAtIndex('-', [3,7])
 
   #
   ## validate: ->
